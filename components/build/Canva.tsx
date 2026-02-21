@@ -4,28 +4,20 @@ import { useCanvas } from "@/hooks/useCanvas";
 import { ComponentRender } from "../ComponentRender";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 
-const dashboardBlockStyle: React.CSSProperties = {
-  border: "var(--dashboard-border)",
-  borderRadius: "var(--radius-dashboard)",
-  background: "var(--dashboard-bg)",
-  minHeight: "100%",
-  padding: "var(--spacing-dashboard)",
-  flex: 1,
-};
-
 export const Canva = () => {
   const { components } = useCanvas();
 
+  console.log(components);
+
   return (
     <section
-      className="canva-dashboard-block"
-      style={dashboardBlockStyle}
-      aria-label="Área do canvas"
+      className="canva-dashboard-block flex-1 min-h-full p-[var(--spacing-dashboard)] bg-[var(--dashboard-bg)] [border:var(--dashboard-border)] rounded-[var(--radius-dashboard)]"
+      aria-label="Canvas area"
     >
       {components.length === 0 ? (
-        <EmptyFallback message="Arraste ou adicione componentes aqui." />
+        <EmptyFallback message="Add your components here." />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div className="flex flex-col gap-3">
           {components.map((c, index) => (
             <ComponentRender key={index} no={c} />
           ))}

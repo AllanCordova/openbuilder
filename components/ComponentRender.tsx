@@ -4,10 +4,29 @@ type PropsType = {
   no: ASTNode;
 };
 
-const validTextTags = ["h1", "h2", "h3", "h4", "h5", "h6", "p", "span"] as const;
+const validTextTags = [
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "p",
+  "span",
+] as const;
 
 export const ComponentRender = ({ no }: PropsType) => {
   switch (no.type) {
+    case "root": {
+      const children = no.children ?? [];
+      return (
+        <>
+          {children.map((child, index) => (
+            <ComponentRender key={index} no={child} />
+          ))}
+        </>
+      );
+    }
     case "Button":
       return (
         <button className={no.props.className} type="button">
@@ -17,7 +36,8 @@ export const ComponentRender = ({ no }: PropsType) => {
     case "Text": {
       const tag = no.props.tag;
       const Tag =
-        typeof tag === "string" && validTextTags.includes(tag as (typeof validTextTags)[number])
+        typeof tag === "string" &&
+        validTextTags.includes(tag as (typeof validTextTags)[number])
           ? (tag as (typeof validTextTags)[number])
           : "span";
       return <Tag className={no.props.className}>{no.props.content ?? ""}</Tag>;
@@ -33,6 +53,16 @@ export const ComponentRender = ({ no }: PropsType) => {
       );
     }
     default:
+      const children = no.children ?? [];
+      if (children.length > 0) {
+        return (
+          <div className={no.props.className}>
+            {children.map((child, index) => (
+              <ComponentRender key={index} no={child} />
+            ))}
+          </div>
+        );
+      }
       return null;
   }
 };
