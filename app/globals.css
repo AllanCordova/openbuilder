@@ -15,6 +15,8 @@
   --color-gray-400: #9ca3af;
   --color-zinc-800: #1f1f1f;
   --color-slate-200: #ededed;
+  --color-red-600: #dc2626;
+  --color-red-400: #f87171;
 }
 
 @theme inline {
@@ -29,13 +31,17 @@
   --background: var(--color-neutral-50);
   --foreground: var(--color-neutral-950);
   --primary: var(--color-violet-600);
-  --primary-hover: var(--color-violet-700);
+  --primary-hover: var(--color-violet-300);
   --secondary: var(--color-violet-400);
   --muted: var(--color-gray-500);
   --background-alt: var(--color-neutral-100);
   --border-light: var(--color-neutral-200);
   --dashboard-border: 2px dashed var(--border-light);
   --dashboard-bg: var(--background-alt);
+  --header-border: rgba(124, 58, 237, 0.15);
+  --header-link: var(--muted);
+  --header-link-active: var(--primary);
+  --destructive: var(--color-red-600);
   --text-xs: clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem);
   --text-sm: clamp(0.8125rem, 0.775rem + 0.1vw, 0.875rem);
   --text-base: clamp(0.9375rem, 0.875rem + 0.2vw, 1rem);
@@ -56,6 +62,10 @@
     --border-light: var(--color-gray-700);
     --dashboard-border: 2px dashed var(--border-light);
     --dashboard-bg: var(--background-alt);
+    --header-border: rgba(167, 139, 250, 0.15);
+    --header-link: var(--muted);
+    --header-link-active: var(--primary);
+    --destructive: var(--color-red-400);
   }
 }
 
@@ -100,4 +110,37 @@ body {
 }
 .gap-spacing-md {
   gap: 0.75rem;
+}
+
+.border-header {
+  border-color: var(--header-border);
+}
+
+.text-header-link {
+  color: var(--header-link);
+}
+
+.text-header-link:hover {
+  color: var(--primary-hover);
+}
+
+.text-header-link-active {
+  color: var(--header-link-active);
+}
+
+.text-header-link-active:hover {
+  color: var(--primary-hover);
+}
+
+/* Build Status Colors */
+.text-status-success {
+  color: #22c55e;
+}
+
+.text-status-failed {
+  color: #ef4444;
+}
+
+.text-status-pending {
+  color: #eab308;
 }

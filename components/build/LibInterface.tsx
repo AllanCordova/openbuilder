@@ -4,45 +4,10 @@ import { Plus } from "lucide-react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { ASTNode, schemaToASTNode } from "@/types/AstNode.type";
-import { ComponentLibrary } from "@prisma/client";
+import { ComponentLibraryDto } from "@/types/ComponentLibrary.dto";
 
 type PropsType = {
-  components: ComponentLibrary[];
-};
-
-const listStyle: React.CSSProperties = {
-  listStyle: "none",
-  padding: 0,
-  margin: 0,
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.5rem",
-};
-
-const itemStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: "0.5rem",
-  padding: "0.5rem 0.75rem",
-  background: "var(--background-alt)",
-  border: "1px solid var(--border-light)",
-  borderRadius: "var(--radius-md)",
-};
-
-const addButtonStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "2rem",
-  height: "2rem",
-  padding: 0,
-  borderRadius: "var(--radius-md)",
-  background: "var(--primary)",
-  color: "var(--background)",
-  border: "none",
-  cursor: "pointer",
-  flexShrink: 0,
+  components: ComponentLibraryDto[];
 };
 
 export const LibInterface = ({ components }: PropsType) => {
@@ -54,41 +19,31 @@ export const LibInterface = ({ components }: PropsType) => {
 
   return (
     <section
-      className="lib-section"
-      aria-label="Biblioteca de componentes"
-      style={{ marginBottom: "var(--spacing-dashboard)" }}
+      className="lib-section mb-[var(--spacing-dashboard)]"
+      aria-label="Component Library"
     >
-      <h2
-        style={{
-          fontSize: "var(--text-base)",
-          fontWeight: 600,
-          color: "var(--foreground)",
-          marginBottom: "0.75rem",
-        }}
-      >
-        Biblioteca de componentes
+      <h2 className="text-[length:var(--text-base)] font-semibold text-foreground mb-3">
+        Component Library
       </h2>
+
       {components.length === 0 ? (
-        <EmptyFallback message="Nenhum componente na biblioteca." />
+        <EmptyFallback message="No components in the library." />
       ) : (
-        <ul style={listStyle}>
+        <ul className="list-none p-0 m-0 flex flex-col gap-2">
           {components.map((c) => (
-            <li key={c.id} style={itemStyle}>
-              <span
-                style={{
-                  fontSize: "var(--text-sm)",
-                  color: "var(--foreground)",
-                  fontWeight: 500,
-                }}
-              >
+            <li
+              key={c.id}
+              className="flex items-center justify-between gap-2 py-2 px-3 bg-[var(--background-alt)] border border-[var(--border-light)] rounded-[var(--radius-md)]"
+            >
+              <span className="text-[length:var(--text-sm)] text-foreground font-medium">
                 {c.name}
               </span>
               <button
                 type="button"
                 onClick={handleAdd(schemaToASTNode(c.default_schema_json))}
-                style={addButtonStyle}
-                title="Adicionar ao canvas"
-                aria-label={`Adicionar ${c.name} ao canvas`}
+                className="inline-flex items-center justify-center w-8 h-8 p-0 rounded-[var(--radius-md)] bg-primary text-background border-none cursor-pointer shrink-0 hover:bg-[var(--primary-hover)] transition-colors"
+                title="Add to canvas"
+                aria-label={`Add ${c.name} to canvas`}
               >
                 <Plus size={18} strokeWidth={2.5} />
               </button>
