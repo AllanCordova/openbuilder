@@ -1,65 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { Page } from "@prisma/client";
-import { Spinner } from "@/components/ui/Spinner";
 import { Canva } from "@/components/build/Canva";
 import { Preview } from "@/components/build/Preview";
-import { ActionResponse } from "@/types/ActionResponse.type";
-import { usePages } from "@/hooks/usePages";
-import { ErrorFallback } from "../ui/ErrorFallback";
-import { EmptyFallback } from "../ui/EmptyFallback";
+import { PageDto } from "@/types/Page.dto";
+import { PropertiesPanel } from "../build/PropertiesPanel";
 
-type Props = {
-  page: ActionResponse<Page>;
-  components: ActionResponse<any[]>;
+type PagesDetailsProps = {
+  page: PageDto;
+  viewMode: "preview" | "canva";
+  onViewChange: (mode: "preview" | "canva") => void;
 };
 
-export const EditorShell = ({ page, components }: Props) => {
-  const [view, setView] = useState<"preview" | "canva">("preview");
-  const [isLoading, setIsLoading] = useState(false);
-  const {} = usePages();
-
+export const EditorShell = ({
+  page,
+  viewMode,
+  onViewChange,
+}: PagesDetailsProps) => {
   const handleToggle = (target: "preview" | "canva") => {
-    setIsLoading(true);
     setTimeout(() => {
-      setView(target);
-      setIsLoading(false);
+      onViewChange(target);
     }, 120);
   };
 
-  const pageError = !page.success ? page.error : null;
-  const componentsError = !components.success ? components.error : null;
-  const pageData = page.success ? page.data : null;
-
-  if (pageError) {
-    return <ErrorFallback error={pageError} name="Page Error:" />;
-  }
-
-  if (componentsError) {
-    return <ErrorFallback error={componentsError} name="Components Error:" />;
-  }
-
-  if (!pageData) {
-    return <EmptyFallback message="Page data not available." />;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="py-6 flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-4">
+    <div className="w-full h-full flex flex-col">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleToggle("preview")}
             className={`inline-flex items-center gap-2 py-2 px-3 rounded-default font-medium transition-colors ${
-              view === "preview"
+              viewMode === "preview"
                 ? "bg-primary text-background"
                 : "bg-background-alt text-foreground hover:bg-[var(--primary-hover)]/10"
             }`}
@@ -69,7 +39,7 @@ export const EditorShell = ({ page, components }: Props) => {
           <button
             onClick={() => handleToggle("canva")}
             className={`inline-flex items-center gap-2 py-2 px-3 rounded-default font-medium transition-colors ${
-              view === "canva"
+              viewMode === "canva"
                 ? "bg-primary text-background"
                 : "bg-background-alt text-foreground hover:bg-[var(--primary-hover)]/10"
             }`}
@@ -79,9 +49,24 @@ export const EditorShell = ({ page, components }: Props) => {
         </div>
       </div>
 
-      <div className="w-full">
-        {view === "preview" && <Preview page={pageData} />}
-        {view === "canva" && <Canva />}
+      <div className="w-full flex-1 min-h-0">
+        {viewMode === "preview" && (
+          <div className="w-full h-full">
+            <Preview page={page} />
+          </div>
+        )}
+
+        {viewMode === "canva" && (
+          <div className="flex items-start gap-4 w-full h-full">
+            <div className="flex-1 min-w-0 h-full overflow-y-auto">
+              <Canva page={page} />
+            </div>
+
+            <aside className="w-80 flex-shrink-0 sticky top-0">
+              <PropertiesPanel />
+            </aside>
+          </div>
+        )}
       </div>
     </div>
   );

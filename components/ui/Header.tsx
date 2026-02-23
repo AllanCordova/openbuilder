@@ -65,7 +65,7 @@ export const Header = () => {
             {user ? (
               <>
                 <Link
-                  href="/project"
+                  href="/projects"
                   className="text-header-link-active flex items-center gap-2 text-typography-body transition-colors font-medium"
                   data-testid="header-canvas-link"
                 >

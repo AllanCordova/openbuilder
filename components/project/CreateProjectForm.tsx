@@ -9,14 +9,15 @@ import {
 import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectMutations } from "@/hooks/useProjects";
+import { ErrorFallback } from "../ui/ErrorFallback";
 
 type CreateProjectFormProps = {
   onSuccess?: () => void;
 };
 
 export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
-  const { addProject } = useProjects();
+  const { createProject } = useProjectMutations();
   const {
     register,
     handleSubmit,
@@ -37,11 +38,13 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
       return;
     }
 
-    const isSuccess = await addProject(result.data);
+    const response = await createProject(result.data);
 
-    if (isSuccess) {
+    if (response.success) {
       reset();
       onSuccess?.();
+    } else {
+      setError("root", { message: response.error || "Error creating project" });
     }
   }
 
@@ -64,6 +67,8 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
           <FolderPlus className="text-primary" size={24} strokeWidth={2} />
           <span>Create Project</span>
         </div>
+
+        {errors.root && <ErrorFallback error={errors.root.message as string} />}
 
         <Input
           label="Project Name"

@@ -1,29 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trash2, AlertCircle, Edit } from "lucide-react";
-import { useProjects } from "@/hooks/useProjects";
+import { useState } from "react";
+import { Trash2, Edit } from "lucide-react";
+import { useProjectsList, useProjectMutations } from "@/hooks/useProjects";
 import { EditProjectModal } from "./EditProjectModal";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { Spinner } from "../ui/Spinner";
 import Link from "next/link";
 import { ErrorFallback } from "../ui/ErrorFallback";
 
-type ProjectListProps = {
-  refreshTrigger?: number;
-};
+export const ProjectList = () => {
+  const { data: projects = [], isLoading, error } = useProjectsList();
+  const { deleteProject } = useProjectMutations();
 
-export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
-  const { projects, loading, error, loadProjects, removeProject } =
-    useProjects();
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const editingProject = projects.find((p) => p.id === editingProjectId);
 
-  useEffect(() => {
-    loadProjects();
-  }, [refreshTrigger, loadProjects]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Spinner />
@@ -32,12 +25,18 @@ export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
   }
 
   if (error) {
-    return <ErrorFallback error={error} />;
+    return <ErrorFallback error={error.message || "Failed to load projects"} />;
   }
 
   if (projects.length === 0) {
     return <EmptyFallback message="No projects yet" />;
   }
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this project?")) {
+      await deleteProject(id);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -70,7 +69,7 @@ export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                removeProject(project.id);
+                handleDelete(project.id);
               }}
               className="inline-flex items-center gap-1 px-3 py-2 rounded-default font-medium text-typography-body bg-[var(--destructive)]/10 text-[var(--destructive)] hover:bg-[var(--destructive)]/20 transition-colors text-sm"
               aria-label="Delete project"
@@ -87,10 +86,7 @@ export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
           project={editingProject}
           isOpen={editingProjectId !== null}
           onClose={() => setEditingProjectId(null)}
-          onSuccess={() => {
-            setEditingProjectId(null);
-            loadProjects();
-          }}
+          onSuccess={() => setEditingProjectId(null)}
         />
       )}
     </div>
