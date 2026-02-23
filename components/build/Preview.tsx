@@ -15,7 +15,7 @@ export const Preview = ({ page }: PropsType) => {
 
   return (
     <>
-      <ComponentRender no={schema} />
+      <ComponentRender no={schema} isEditable={false} />
     </>
   );
 };

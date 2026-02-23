@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trash2, FileText, AlertCircle, Edit } from "lucide-react";
+import { useState } from "react";
+import { Trash2, FileText, Edit } from "lucide-react";
 import Link from "next/link";
-import { usePages } from "@/hooks/usePages";
+import { usePagesList, usePageMutations } from "@/hooks/usePages";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import type { PageDto } from "@/types/Page.dto";
@@ -15,20 +15,23 @@ type PageListProps = {
 };
 
 export const PageList = ({ projectId }: PageListProps) => {
-  const { pages, loading, error, loadPages, removePage } = usePages();
+  const { data: pages = [], isLoading, error } = usePagesList(projectId);
+
+  const { deletePage } = usePageMutations(projectId);
+
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
   const editingPage = pages.find((p) => p.id === editingPageId) || null;
 
-  useEffect(() => {
-    loadPages(projectId);
-  }, [projectId, loadPages]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Spinner />
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorFallback error={error.message || "Error loading pages"} />;
   }
 
   if (pages.length === 0) {
@@ -37,14 +40,12 @@ export const PageList = ({ projectId }: PageListProps) => {
 
   const handleDelete = async (page: PageDto) => {
     if (confirm(`Are you sure you want to delete "${page.name}"?`)) {
-      await removePage(page.id, projectId);
+      await deletePage(page.id);
     }
   };
 
   return (
     <div className="w-full space-y-4">
-      {error && <ErrorFallback error={error} />}
-
       <div className="grid gap-3">
         {pages.map((page) => (
           <div
@@ -105,7 +106,6 @@ export const PageList = ({ projectId }: PageListProps) => {
             onClose={() => setEditingPageId(null)}
             onSuccess={() => {
               setEditingPageId(null);
-              loadPages(projectId);
             }}
           />
         )}

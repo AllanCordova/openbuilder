@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Edit, AlertCircle, Check, X } from "lucide-react";
+import { Edit, Check, X } from "lucide-react";
 import {
   updateProjectSchema,
   type UpdateProjectSchema,
@@ -10,7 +10,7 @@ import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { ProjectDto } from "@/types/Project.dto";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectMutations } from "@/hooks/useProjects";
 import { ErrorFallback } from "../ui/ErrorFallback";
 
 type EditProjectModalProps = {
@@ -26,7 +26,7 @@ export const EditProjectModal = ({
   onClose,
   onSuccess,
 }: EditProjectModalProps) => {
-  const { editProject, error: storeError } = useProjects();
+  const { updateProject } = useProjectMutations();
   const {
     register,
     handleSubmit,
@@ -49,10 +49,13 @@ export const EditProjectModal = ({
       return;
     }
 
-    const isSuccess = await editProject(project.id, result.data);
-    if (isSuccess) {
+    const response = await updateProject({ id: project.id, data: result.data });
+
+    if (response.success) {
       reset();
       onSuccess?.();
+    } else {
+      setError("root", { message: response.error || "Failed to edit project" });
     }
   }
 
@@ -98,7 +101,9 @@ export const EditProjectModal = ({
             </button>
           </div>
 
-          {storeError && <ErrorFallback error={storeError} />}
+          {errors.root && (
+            <ErrorFallback error={errors.root.message as string} />
+          )}
 
           <Input
             label="Project Name"

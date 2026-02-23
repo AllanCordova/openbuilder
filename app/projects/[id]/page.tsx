@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, use } from "react";
+import { use } from "react";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectByIdQuery } from "@/hooks/useProjects";
 import { PageList } from "@/components/section/PageList";
 import { CreatePageForm } from "@/components/section/CreatePageForm";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
@@ -17,16 +17,9 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
 
-  const { currentProject, loading, loadProject, clearCurrentProject, error } =
-    useProjects();
+  const { data: currentProject, isLoading, error } = useProjectByIdQuery(id);
 
-  useEffect(() => {
-    loadProject(id);
-
-    return () => clearCurrentProject();
-  }, [id, loadProject, clearCurrentProject]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Spinner />
@@ -35,7 +28,7 @@ export default function ProjectDetailPage({
   }
 
   if (error) {
-    return <ErrorFallback error={error} />;
+    return <ErrorFallback error={error.message || "Failed to load project"} />;
   }
 
   if (!currentProject) {
