@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
-import { signIn } from "@/actions/Auth.action";
+import { LogIn, Mail, Lock } from "lucide-react";
 import { signInSchema, type SignInSchema } from "@/schemas/Auth.schema";
 import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { useRouter } from "next/navigation";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { useProfileMutations } from "@/hooks/useProfile";
 
 export const LoginForm = () => {
   const {
@@ -23,6 +23,8 @@ export const LoginForm = () => {
 
   const router = useRouter();
 
+  const { login } = useProfileMutations();
+
   async function onSubmit(data: SignInSchema) {
     const result = signInSchema.safeParse(data);
     if (!result.success) {
@@ -33,14 +35,13 @@ export const LoginForm = () => {
       return;
     }
 
-    const response = await signIn(result.data);
+    const response = await login(result.data);
     if (!response.success) {
       setError("root", { message: response.error ?? "Something went wrong" });
       return;
     }
 
     router.push("/");
-    router.refresh();
   }
 
   return (

@@ -12,7 +12,7 @@ const defaultMessage = "Not Found!";
 
 export const EmptyFallback = ({
   message = defaultMessage,
-  showBackButton = true,
+  showBackButton = false,
 }: EmptyFallbackProps) => {
   const router = useRouter();
 

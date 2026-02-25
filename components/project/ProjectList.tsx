@@ -1,43 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trash2, AlertCircle, Edit } from "lucide-react";
-import { useProjects } from "@/hooks/useProjects";
+import { useState } from "react";
+import { Trash2, Edit } from "lucide-react";
+import { useProjectsList, useProjectMutations } from "@/hooks/useProjects";
 import { EditProjectModal } from "./EditProjectModal";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { Spinner } from "../ui/Spinner";
 import Link from "next/link";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { toast } from "sonner";
 
-type ProjectListProps = {
-  refreshTrigger?: number;
-};
+export const ProjectList = () => {
+  const { data: projects = [], isLoading, error } = useProjectsList();
+  const { deleteProject } = useProjectMutations();
+  const { ask } = useConfirmModal();
 
-export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
-  const { projects, loading, error, loadProjects, removeProject } =
-    useProjects();
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const editingProject = projects.find((p) => p.id === editingProjectId);
 
-  useEffect(() => {
-    loadProjects();
-  }, [refreshTrigger, loadProjects]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <Spinner />
-      </div>
-    );
+  if (isLoading) {
+    return <Spinner />;
   }
 
   if (error) {
-    return <ErrorFallback error={error} />;
+    return <ErrorFallback error={error.message || "Failed to load projects"} />;
   }
 
   if (projects.length === 0) {
     return <EmptyFallback message="No projects yet" />;
   }
+
+  const handleDelete = async (id: string) => {
+    const isConfirmed = await ask(
+      "Are you sure you want to delete this project?",
+    );
+
+    if (isConfirmed) {
+      await deleteProject(id);
+      toast.success("project deleted!");
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -70,7 +73,7 @@ export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                removeProject(project.id);
+                handleDelete(project.id);
               }}
               className="inline-flex items-center gap-1 px-3 py-2 rounded-default font-medium text-typography-body bg-[var(--destructive)]/10 text-[var(--destructive)] hover:bg-[var(--destructive)]/20 transition-colors text-sm"
               aria-label="Delete project"
@@ -87,10 +90,7 @@ export const ProjectList = ({ refreshTrigger = 0 }: ProjectListProps) => {
           project={editingProject}
           isOpen={editingProjectId !== null}
           onClose={() => setEditingProjectId(null)}
-          onSuccess={() => {
-            setEditingProjectId(null);
-            loadProjects();
-          }}
+          onSuccess={() => setEditingProjectId(null)}
         />
       )}
     </div>
