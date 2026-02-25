@@ -1,13 +1,13 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Edit, Check, X } from "lucide-react";
+import { Edit, AlertCircle, Check, X } from "lucide-react";
 import { updatePageSchema, type UpdatePageSchema } from "@/schemas/Page.schema";
 import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import type { PageDto } from "@/types/Page.dto";
-import { usePageMutations } from "@/hooks/usePages";
+import { usePages } from "@/hooks/usePages";
 import { ErrorFallback } from "../ui/ErrorFallback";
 
 type EditPageModalProps = {
@@ -23,8 +23,7 @@ export const EditPageModal = ({
   onClose,
   onSuccess,
 }: EditPageModalProps) => {
-  const { updatePage } = usePageMutations(page.projectId);
-
+  const { editPage, error: storeError } = usePages();
   const {
     register,
     handleSubmit,
@@ -45,15 +44,10 @@ export const EditPageModal = ({
       return;
     }
 
-    const response = await updatePage({ id: page.id, data: result.data });
-
-    if (response.success) {
+    const isSuccess = await editPage(page.id, page.projectId, result.data);
+    if (isSuccess) {
       reset();
       onSuccess?.();
-    } else {
-      setError("root", {
-        message: response.error,
-      });
     }
   }
 
@@ -100,9 +94,7 @@ export const EditPageModal = ({
             </button>
           </div>
 
-          {errors.root && (
-            <ErrorFallback error={errors.root.message as string} />
-          )}
+          {storeError && <ErrorFallback error={storeError} />}
 
           <Input
             label="Page Name"

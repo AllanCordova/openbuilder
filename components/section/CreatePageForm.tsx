@@ -6,8 +6,7 @@ import { createPageSchema, type CreatePageSchema } from "@/schemas/Page.schema";
 import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
-import { usePageMutations } from "@/hooks/usePages";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { usePages } from "@/hooks/usePages";
 
 type CreatePageFormProps = {
   projectId: string;
@@ -18,8 +17,7 @@ export const CreatePageForm = ({
   projectId,
   onSuccess,
 }: CreatePageFormProps) => {
-  const { createPage } = usePageMutations(projectId);
-
+  const { addPage } = usePages();
   const {
     register,
     handleSubmit,
@@ -40,13 +38,11 @@ export const CreatePageForm = ({
       return;
     }
 
-    const response = await createPage(result.data);
+    const isSuccess = await addPage(result.data);
 
-    if (response.success) {
+    if (isSuccess) {
       reset({ projectId, name: "" });
       onSuccess?.();
-    } else {
-      setError("root", { message: response.error });
     }
   }
 
@@ -69,8 +65,6 @@ export const CreatePageForm = ({
           <FileText className="text-primary" size={24} strokeWidth={2} />
           <span>Create Page</span>
         </div>
-
-        {errors.root && <ErrorFallback error={errors.root.message} />}
 
         <Input
           label="Page Name"

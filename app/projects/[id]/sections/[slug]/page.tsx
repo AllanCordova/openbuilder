@@ -1,14 +1,9 @@
-"use client";
-
-import { use, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { usePageBySlugQuery } from "@/hooks/usePages";
 import { getComponents } from "@/actions/ComponentLibrary.action";
+import { getPageBySlug } from "@/actions/Page.action";
 import { LibInterface } from "@/components/build/LibInterface";
 import { SavePage } from "@/components/section/SavePage";
 import { EditorShell } from "@/components/section/EditorShell";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
-import { Spinner } from "@/components/ui/Spinner";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -19,37 +14,18 @@ type PagesDetailsProps = {
   }>;
 };
 
-export default function PagesDetails({ params }: PagesDetailsProps) {
-  const { id, slug } = use(params);
+export default async function PagesDetails({ params }: PagesDetailsProps) {
+  const { id, slug } = await params;
 
-  const [viewMode, setViewMode] = useState<"preview" | "canva">("canva");
+  const componentsRes = await getComponents();
 
-  const { data: page, isLoading: isLoadingPage } = usePageBySlugQuery(
-    id,
-    `/${slug}`,
-  );
+  const pageRes = await getPageBySlug({ projectId: id, slug: `/${slug}` });
 
-  const { data: componentsRes, isLoading: isLoadingComps } = useQuery({
-    queryKey: ["components-library"],
-    queryFn: async () => {
-      const res = await getComponents();
-      return res;
-    },
-  });
-
-  if (isLoadingPage || isLoadingComps) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (!componentsRes?.data) {
+  if (!componentsRes.data) {
     return <EmptyFallback message="Component not found!" />;
   }
 
-  if (!page) {
+  if (!pageRes.data) {
     return <EmptyFallback message="Page not found!" />;
   }
 
@@ -58,36 +34,34 @@ export default function PagesDetails({ params }: PagesDetailsProps) {
       className="min-h-screen flex"
       style={{ background: "var(--background)" }}
     >
-      {viewMode === "canva" && (
-        <article
-          className="lib-article"
+      <article
+        className="lib-article"
+        style={{
+          width: "min(20rem, 100%)",
+          minWidth: "16rem",
+          padding: "var(--spacing-dashboard)",
+          borderRight: "1px solid var(--border-light)",
+          flexShrink: 0,
+        }}
+      >
+        <Link
+          href={`/projects/${id}`}
+          className="flex items-center gap-2 text-primary text-sm mb-4 hover:underline"
+        >
+          <ChevronLeft size={16} /> Go out
+        </Link>
+        <h1
           style={{
-            width: "min(20rem, 100%)",
-            minWidth: "16rem",
-            padding: "var(--spacing-dashboard)",
-            borderRight: "1px solid var(--border-light)",
-            flexShrink: 0,
+            fontSize: "var(--text-xl)",
+            fontWeight: 700,
+            color: "var(--foreground)",
+            marginBottom: "var(--spacing-dashboard)",
           }}
         >
-          <Link
-            href={`/projects/${id}`}
-            className="flex items-center gap-2 text-primary text-sm mb-4 hover:underline"
-          >
-            <ChevronLeft size={16} /> Go out
-          </Link>
-          <h1
-            style={{
-              fontSize: "var(--text-xl)",
-              fontWeight: 700,
-              color: "var(--foreground)",
-              marginBottom: "var(--spacing-dashboard)",
-            }}
-          >
-            Components
-          </h1>
-          <LibInterface components={componentsRes.data} />
-        </article>
-      )}
+          Components
+        </h1>
+        <LibInterface components={componentsRes.data} />
+      </article>
 
       <main
         className="canva-area"
@@ -106,19 +80,15 @@ export default function PagesDetails({ params }: PagesDetailsProps) {
               Edit Page
             </span>
             <h2 className="text-2xl font-bold text-foreground">
-              {page.name || "Página não encontrada"}
+              {pageRes.data.name || "Página não encontrada"}
             </h2>
           </div>
           <div>
-            <SavePage pageId={page.id} projectId={id} pageSlug={page.slug} />
+            <SavePage pageId={pageRes.data.id} projectId={id} />
           </div>
         </header>
 
-        <EditorShell
-          page={page}
-          viewMode={viewMode}
-          onViewChange={setViewMode}
-        />
+        <EditorShell page={pageRes} components={componentsRes} />
       </main>
     </div>
   );

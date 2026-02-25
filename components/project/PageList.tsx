@@ -7,7 +7,7 @@ import { usePages } from "@/hooks/usePages";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import type { PageDto } from "@/types/Page.dto";
-import { EditPageModal } from "./EditPageModal";
+import { EditPageModal } from "../section/EditPageModal";
 import { ErrorFallback } from "../ui/ErrorFallback";
 
 type PageListProps = {

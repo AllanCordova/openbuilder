@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { create } from "zustand";
+import { ProjectDto } from "@/types/Project.dto";
 import {
   getUserProjects,
   getProjectById,
@@ -8,74 +9,108 @@ import {
   createProject,
   updateProject,
 } from "@/actions/Project.action";
-import type {
+import {
   CreateProjectSchema,
   UpdateProjectSchema,
 } from "@/schemas/Project.schema";
 
-export const useProjectsList = () => {
-  return useQuery({
-    queryKey: ["projects"],
-    queryFn: async () => {
-      const response = await getUserProjects();
-      if (!response.success) throw new Error(response.error);
-      return response.data || [];
-    },
-  });
-};
+interface ProjectsStore {
+  projects: ProjectDto[];
+  currentProject: ProjectDto | null;
+  loading: boolean;
+  error: string | null;
 
-export const useProjectByIdQuery = (id: string) => {
-  return useQuery({
-    queryKey: ["project", id],
-    queryFn: async () => {
-      const response = await getProjectById({ id });
-      if (!response.success) throw new Error(response.error);
-      return response.data;
-    },
-    enabled: !!id,
-  });
-};
+  loadProjects: () => Promise<boolean>;
+  loadProject: (id: string) => Promise<boolean>;
+  addProject: (data: CreateProjectSchema) => Promise<boolean>;
+  removeProject: (id: string) => Promise<boolean>;
+  editProject: (id: string, data: UpdateProjectSchema) => Promise<boolean>;
+  clearCurrentProject: () => void;
+}
 
-export const useProjectMutations = () => {
-  const queryClient = useQueryClient();
+export const useProjects = create<ProjectsStore>((set) => ({
+  projects: [],
+  currentProject: null,
+  loading: true,
+  error: null,
 
-  const createMutation = useMutation({
-    mutationFn: async (data: CreateProjectSchema) => {
-      return await createProject(data);
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["projects"] });
-      }
-    },
-  });
+  loadProjects: async () => {
+    set({ loading: true, error: null });
+    const response = await getUserProjects();
 
-  const updateMutation = useMutation({
-    mutationFn: async (params: { id: string; data: UpdateProjectSchema }) => {
-      return await updateProject({ id: params.id, data: params.data });
-    },
-    onSuccess: (response, variables) => {
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["projects"] });
-        queryClient.invalidateQueries({ queryKey: ["project", variables.id] });
-      }
-    },
-  });
+    if (response.success && response.data) {
+      set({ projects: response.data, loading: false });
+      return true;
+    }
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return await deleteProject({ id });
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["projects"] });
-      }
-    },
-  });
+    set({
+      error: response.error,
+      loading: false,
+    });
 
-  return {
-    createProject: createMutation.mutateAsync,
-    updateProject: updateMutation.mutateAsync,
-    deleteProject: deleteMutation.mutateAsync,
-  };
-};
+    return false;
+  },
+
+  loadProject: async (id: string) => {
+    set({ loading: true, error: null });
+
+    const response = await getProjectById({ id });
+
+    if (response.success && response.data) {
+      set({ currentProject: response.data, loading: false });
+      return true;
+    }
+
+    set({ error: response.error, loading: false, currentProject: null });
+    return false;
+  },
+
+  addProject: async (data: CreateProjectSchema) => {
+    set({ error: null });
+    const response = await createProject(data);
+
+    if (response.success && response.data) {
+      set((state) => ({
+        projects: [response.data, ...state.projects],
+      }));
+      return true;
+    }
+    set({ error: response.error });
+
+    return false;
+  },
+
+  removeProject: async (id: string) => {
+    set({ error: null });
+
+    const response = await deleteProject({ id });
+
+    if (response.success) {
+      set((state) => ({
+        projects: state.projects.filter((p) => p.id !== id),
+      }));
+      return true;
+    }
+    set({ error: response.error });
+
+    return false;
+  },
+
+  editProject: async (id: string, data: UpdateProjectSchema) => {
+    set({ error: null });
+
+    const response = await updateProject({ id, data });
+
+    if (response.success && response.data) {
+      set((state) => ({
+        projects: state.projects.map((p) => (p.id === id ? response.data : p)),
+      }));
+      return true;
+    }
+    set({ error: response.error });
+
+    return false;
+  },
+
+  clearCurrentProject: () => set({ currentProject: null }),
+}));

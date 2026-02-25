@@ -1,9 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { CreateProjectForm } from "@/components/project/CreateProjectForm";
 import { ProjectList } from "@/components/project/ProjectList";
 
 export default function ProjectPage() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  function handleProjectCreated() {
+    setRefreshTrigger((prev) => prev + 1);
+  }
+
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-canvas mx-auto py-8 px-4">
@@ -18,7 +25,7 @@ export default function ProjectPage() {
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <CreateProjectForm />
+            <CreateProjectForm onSuccess={handleProjectCreated} />
           </div>
 
           <div className="lg:col-span-3">
@@ -26,7 +33,7 @@ export default function ProjectPage() {
               <h2 className="text-typography-heading font-semibold text-foreground mb-6">
                 Your Projects
               </h2>
-              <ProjectList />
+              <ProjectList refreshTrigger={refreshTrigger} />
             </div>
           </div>
         </div>
