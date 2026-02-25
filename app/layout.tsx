@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/ui/Header";
 import { Toaster } from "sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { QueryProvider } from "./QueryProvider";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +35,7 @@ export default function RootLayout({
           <Header />
           <Toaster richColors closeButton />
           {children}
+          <ConfirmModal />
         </QueryProvider>
       </body>
     </html>

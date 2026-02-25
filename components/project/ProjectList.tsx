@@ -8,20 +8,19 @@ import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { Spinner } from "../ui/Spinner";
 import Link from "next/link";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { toast } from "sonner";
 
 export const ProjectList = () => {
   const { data: projects = [], isLoading, error } = useProjectsList();
   const { deleteProject } = useProjectMutations();
+  const { ask } = useConfirmModal();
 
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const editingProject = projects.find((p) => p.id === editingProjectId);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <Spinner />
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (error) {
@@ -33,8 +32,13 @@ export const ProjectList = () => {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this project?")) {
+    const isConfirmed = await ask(
+      "Are you sure you want to delete this project?",
+    );
+
+    if (isConfirmed) {
       await deleteProject(id);
+      toast.success("project deleted!");
     }
   };
 

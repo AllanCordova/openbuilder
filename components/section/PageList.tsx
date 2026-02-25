@@ -9,6 +9,8 @@ import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import type { PageDto } from "@/types/Page.dto";
 import { EditPageModal } from "./EditPageModal";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { toast } from "sonner";
 
 type PageListProps = {
   projectId: string;
@@ -18,16 +20,13 @@ export const PageList = ({ projectId }: PageListProps) => {
   const { data: pages = [], isLoading, error } = usePagesList(projectId);
 
   const { deletePage } = usePageMutations(projectId);
+  const { ask } = useConfirmModal();
 
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
   const editingPage = pages.find((p) => p.id === editingPageId) || null;
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Spinner />
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (error) {
@@ -39,8 +38,12 @@ export const PageList = ({ projectId }: PageListProps) => {
   }
 
   const handleDelete = async (page: PageDto) => {
-    if (confirm(`Are you sure you want to delete "${page.name}"?`)) {
+    const isConfirmed = await ask(
+      `Are you sure you want to delete "${page.name}"?`,
+    );
+    if (isConfirmed) {
       await deletePage(page.id);
+      toast.success("Page deleted!");
     }
   };
 
