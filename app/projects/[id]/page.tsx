@@ -20,11 +20,7 @@ export default function ProjectDetailPage({
   const { data: currentProject, isLoading, error } = useProjectByIdQuery(id);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (error) {

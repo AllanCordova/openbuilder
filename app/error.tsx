@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { AlertTriangle } from "lucide-react";
 
 export default function Error({
   error,
@@ -10,29 +11,43 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("UI Error Boundary acionado.");
+    console.error("UI Error Boundary triggered:", error);
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-12 bg-red-50 text-red-900 rounded-lg">
-      <h2 className="text-xl font-bold mb-2">
-        Ops! Algo deu errado no servidor.
-      </h2>
+    <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center bg-[var(--background)] p-[var(--spacing-dashboard)]">
+      <div className="flex w-full max-w-md flex-col items-center rounded-[var(--radius-lg)] border border-[var(--border-light)] bg-[var(--background-alt)] p-8 text-center shadow-sm">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--destructive)]/10 text-[var(--destructive)]">
+          <AlertTriangle size={24} />
+        </div>
 
-      <p>Não foi possível carregar esta página.</p>
+        <h2 className="mb-2 text-[var(--text-lg)] font-bold text-[var(--foreground)]">
+          Oops! Something went wrong.
+        </h2>
 
-      {error.digest && (
-        <p className="text-xs text-red-500 mt-2 font-mono">
-          Código do erro: {error.digest}
+        <p className="mb-6 text-[var(--text-base)] text-[var(--muted)]">
+          Could not load the interface correctly. Please try reloading or try
+          again.
         </p>
-      )}
 
-      <button
-        onClick={() => reset()}
-        className="mt-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-      >
-        Tentar novamente
-      </button>
+        {error.digest && (
+          <div className="mb-6 w-full rounded-[var(--radius-sm)] border border-[var(--border-light)] bg-[var(--background)] p-3 text-left">
+            <p className="font-mono text-[var(--text-xs)] text-[var(--muted)] break-all">
+              <span className="font-semibold text-[var(--destructive)]">
+                Code:{" "}
+              </span>
+              {error.digest}
+            </p>
+          </div>
+        )}
+
+        <button
+          onClick={() => reset()}
+          className="rounded-default bg-[var(--primary)] px-6 py-2.5 text-[var(--text-sm)] font-medium text-[var(--color-neutral-50)] transition-colors hover:bg-[var(--primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-[var(--background-alt)]"
+        >
+          Try again
+        </button>
+      </div>
     </div>
   );
 }
