@@ -3,47 +3,27 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Layout, User, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
-import { getCurrentUser, signOut } from "@/actions/Auth.action";
-
-type CurrentUser = {
-  id: string;
-  name: string;
-  email: string;
-} | null;
+import { useProfile, useProfileMutations } from "@/hooks/useProfile";
+import { ErrorFallback } from "./ErrorFallback";
+import { toast } from "sonner";
 
 export const Header = () => {
-  const [user, setUser] = useState<CurrentUser>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await getCurrentUser();
-        if (response.success && response.data) {
-          setUser(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchUser();
-  }, []);
+  const { data, isLoading, error } = useProfile();
+  const { logout } = useProfileMutations();
 
   const handleLogout = async () => {
-    try {
-      await signOut();
-      setUser(null);
+    const response = await logout();
+
+    if (response.success) {
       router.push("/login");
-      router.refresh();
-    } catch (error) {
-      console.error("Failed to logout:", error);
+      toast.success("Logged out successfully!");
     }
   };
+
+  if (error) {
+    return <ErrorFallback error={error.message || "Failed to load user!"} />;
+  }
 
   return (
     <header
@@ -60,9 +40,9 @@ export const Header = () => {
       </Link>
 
       <nav className="flex items-center gap-spacing-md">
-        {!loading && (
+        {!isLoading && (
           <>
-            {user ? (
+            {data ? (
               <>
                 <Link
                   href="/projects"
@@ -74,7 +54,7 @@ export const Header = () => {
                 </Link>
                 <div className="flex items-center gap-2 text-header-link text-typography-body px-2 py-1 bg-background-alt rounded-default">
                   <User size={20} strokeWidth={2} />
-                  <span data-testid="header-user-name">{user.name}</span>
+                  <span data-testid="header-user-name">{data.name}</span>
                 </div>
 
                 <button

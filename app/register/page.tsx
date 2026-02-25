@@ -1,4 +1,3 @@
-import { Header } from "@/components/ui/Header";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 
 export default function RegisterPage() {
