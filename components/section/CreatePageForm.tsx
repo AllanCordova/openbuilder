@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { usePageMutations } from "@/hooks/usePages";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { toast } from "sonner";
 
 type CreatePageFormProps = {
   projectId: string;
@@ -45,6 +46,7 @@ export const CreatePageForm = ({
     if (response.success) {
       reset({ projectId, name: "" });
       onSuccess?.();
+      toast.success("Page created!");
     } else {
       setError("root", { message: response.error });
     }

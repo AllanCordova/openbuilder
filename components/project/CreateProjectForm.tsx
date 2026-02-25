@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { useProjectMutations } from "@/hooks/useProjects";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { toast } from "sonner";
 
 type CreateProjectFormProps = {
   onSuccess?: () => void;
@@ -43,6 +44,7 @@ export const CreateProjectForm = ({ onSuccess }: CreateProjectFormProps) => {
     if (response.success) {
       reset();
       onSuccess?.();
+      toast.success("project created!");
     } else {
       setError("root", { message: response.error || "Error creating project" });
     }

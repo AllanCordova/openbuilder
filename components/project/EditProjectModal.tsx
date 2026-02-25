@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ProjectDto } from "@/types/Project.dto";
 import { useProjectMutations } from "@/hooks/useProjects";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { toast } from "sonner";
 
 type EditProjectModalProps = {
   project: ProjectDto;
@@ -54,6 +55,7 @@ export const EditProjectModal = ({
     if (response.success) {
       reset();
       onSuccess?.();
+      toast.success("project edited!");
     } else {
       setError("root", { message: response.error || "Failed to edit project" });
     }

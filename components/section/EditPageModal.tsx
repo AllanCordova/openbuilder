@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import type { PageDto } from "@/types/Page.dto";
 import { usePageMutations } from "@/hooks/usePages";
 import { ErrorFallback } from "../ui/ErrorFallback";
+import { toast } from "sonner";
 
 type EditPageModalProps = {
   page: PageDto;
@@ -50,6 +51,7 @@ export const EditPageModal = ({
     if (response.success) {
       reset();
       onSuccess?.();
+      toast.success("Page edited!");
     } else {
       setError("root", {
         message: response.error,
