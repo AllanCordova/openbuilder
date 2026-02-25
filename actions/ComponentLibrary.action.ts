@@ -6,8 +6,8 @@ import {
   type ComponentLibraryUpdateData,
 } from "@/service/ComponentLibrary.service";
 
-export const getComponents = Wrapper.private(async (userId, paginator?) => {
-  return await componentLibraryService.getAll(paginator);
+export const getComponents = Wrapper.private(async (userId) => {
+  return await componentLibraryService.getAll();
 });
 
 export const updateComponent = Wrapper.private(

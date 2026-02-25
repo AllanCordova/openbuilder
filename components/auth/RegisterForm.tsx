@@ -40,6 +40,7 @@ export const RegisterForm = () => {
     }
 
     router.push("/login");
+    router.refresh();
   }
 
   return (

@@ -1,35 +1,65 @@
 "use client";
 
+import { useState } from "react";
+import { Page } from "@prisma/client";
+import { Spinner } from "@/components/ui/Spinner";
 import { Canva } from "@/components/build/Canva";
 import { Preview } from "@/components/build/Preview";
-import { PageDto } from "@/types/Page.dto";
-import { PropertiesPanel } from "../build/PropertiesPanel";
+import { ActionResponse } from "@/types/ActionResponse.type";
+import { usePages } from "@/hooks/usePages";
+import { ErrorFallback } from "../ui/ErrorFallback";
+import { EmptyFallback } from "../ui/EmptyFallback";
 
-type PagesDetailsProps = {
-  page: PageDto;
-  viewMode: "preview" | "canva";
-  onViewChange: (mode: "preview" | "canva") => void;
+type Props = {
+  page: ActionResponse<Page>;
+  components: ActionResponse<any[]>;
 };
 
-export const EditorShell = ({
-  page,
-  viewMode,
-  onViewChange,
-}: PagesDetailsProps) => {
+export const EditorShell = ({ page, components }: Props) => {
+  const [view, setView] = useState<"preview" | "canva">("preview");
+  const [isLoading, setIsLoading] = useState(false);
+  const {} = usePages();
+
   const handleToggle = (target: "preview" | "canva") => {
+    setIsLoading(true);
     setTimeout(() => {
-      onViewChange(target);
+      setView(target);
+      setIsLoading(false);
     }, 120);
   };
 
+  const pageError = !page.success ? page.error : null;
+  const componentsError = !components.success ? components.error : null;
+  const pageData = page.success ? page.data : null;
+
+  if (pageError) {
+    return <ErrorFallback error={pageError} name="Page Error:" />;
+  }
+
+  if (componentsError) {
+    return <ErrorFallback error={componentsError} name="Components Error:" />;
+  }
+
+  if (!pageData) {
+    return <EmptyFallback message="Page data not available." />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="py-6 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleToggle("preview")}
             className={`inline-flex items-center gap-2 py-2 px-3 rounded-default font-medium transition-colors ${
-              viewMode === "preview"
+              view === "preview"
                 ? "bg-primary text-background"
                 : "bg-background-alt text-foreground hover:bg-[var(--primary-hover)]/10"
             }`}
@@ -39,7 +69,7 @@ export const EditorShell = ({
           <button
             onClick={() => handleToggle("canva")}
             className={`inline-flex items-center gap-2 py-2 px-3 rounded-default font-medium transition-colors ${
-              viewMode === "canva"
+              view === "canva"
                 ? "bg-primary text-background"
                 : "bg-background-alt text-foreground hover:bg-[var(--primary-hover)]/10"
             }`}
@@ -49,24 +79,9 @@ export const EditorShell = ({
         </div>
       </div>
 
-      <div className="w-full flex-1 min-h-0">
-        {viewMode === "preview" && (
-          <div className="w-full h-full overflow-y-auto">
-            <Preview page={page} />
-          </div>
-        )}
-
-        {viewMode === "canva" && (
-          <div className="flex gap-4 w-full h-full min-h-0">
-            <div className="flex-1 min-w-0 h-full overflow-y-auto rounded-md border border-[var(--border-light)]">
-              <Canva page={page} />
-            </div>
-
-            <aside className="w-80 h-full flex-shrink-0 flex flex-col min-h-0 bg-[var(--background-alt)] border border-[var(--border-light)] rounded-md overflow-hidden">
-              <PropertiesPanel />
-            </aside>
-          </div>
-        )}
+      <div className="w-full">
+        {view === "preview" && <Preview page={pageData} />}
+        {view === "canva" && <Canva />}
       </div>
     </div>
   );

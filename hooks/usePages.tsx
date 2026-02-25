@@ -1,111 +1,102 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { create } from "zustand";
+import type { PageDto } from "@/types/Page.dto";
+import type { CreatePageSchema, UpdatePageSchema } from "@/schemas/Page.schema";
 import {
   getProjectPages,
-  getPageBySlug,
   createPage,
   updatePage,
   deletePage,
-  savePageCanvas,
 } from "@/actions/Page.action";
-import type { CreatePageSchema, UpdatePageSchema } from "@/schemas/Page.schema";
 
-export const usePagesList = (projectId: string) => {
-  return useQuery({
-    queryKey: ["pages", projectId],
-    queryFn: async () => {
-      const response = await getProjectPages({ projectId });
-      if (!response.success) throw new Error(response.error);
-      return response.data || [];
-    },
-    enabled: !!projectId,
-  });
-};
+interface PagesStore {
+  pages: PageDto[];
+  loading: boolean;
+  error: string | null;
+  loadPages: (projectId: string) => Promise<boolean>;
+  addPage: (data: CreatePageSchema) => Promise<boolean>;
+  removePage: (id: string, projectId: string) => Promise<boolean>;
+  editPage: (
+    id: string,
+    projectId: string,
+    data: UpdatePageSchema,
+  ) => Promise<boolean>;
+  clearError: () => void;
+}
 
-export const usePageBySlugQuery = (projectId: string, slug: string) => {
-  return useQuery({
-    queryKey: ["page", projectId, slug],
-    queryFn: async () => {
-      const response = await getPageBySlug({ projectId, slug });
-      if (!response.success) throw new Error(response.error);
-      return response.data;
-    },
-    enabled: !!projectId && !!slug,
-  });
-};
+export const usePages = create<PagesStore>((set) => ({
+  pages: [],
+  loading: true,
+  error: null,
 
-export const usePageMutations = (projectId: string) => {
-  const queryClient = useQueryClient();
+  loadPages: async (projectId: string) => {
+    set({ loading: true, error: null });
 
-  const createMutation = useMutation({
-    mutationFn: async (data: CreatePageSchema) => {
-      return await createPage(data);
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["pages", projectId] });
-      }
-    },
-  });
+    const response = await getProjectPages({ projectId });
 
-  const updateMutation = useMutation({
-    mutationFn: async (params: { id: string; data: UpdatePageSchema }) => {
-      return await updatePage({
-        id: params.id,
-        projectId,
-        data: params.data,
-      });
-    },
-    onSuccess: (response) => {
-      if (response.success && response.data) {
-        queryClient.invalidateQueries({ queryKey: ["pages", projectId] });
-        if (response.data.slug) {
-          queryClient.invalidateQueries({
-            queryKey: ["page", projectId, response.data.slug],
-          });
-        }
-      }
-    },
-  });
+    if (response.success && response.data) {
+      set({ pages: response.data, loading: false });
+      return true;
+    }
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return await deletePage({ id, projectId });
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["pages", projectId] });
-      }
-    },
-  });
+    set({
+      error: response.error,
+      loading: false,
+    });
 
-  const saveCanvasMutation = useMutation({
-    mutationFn: async (params: { id: string; schema: any; slug: string }) => {
-      return await savePageCanvas({
-        id: params.id,
-        projectId,
-        schema: params.schema,
-      });
-    },
-    onSuccess: (response, variables) => {
-      if (response.success) {
-        queryClient.invalidateQueries({
-          queryKey: ["page", projectId, variables.slug],
-        });
-      }
-    },
-  });
+    return false;
+  },
 
-  return {
-    createPage: createMutation.mutateAsync,
-    updatePage: updateMutation.mutateAsync,
-    deletePage: deleteMutation.mutateAsync,
-    saveCanvas: saveCanvasMutation.mutateAsync,
+  addPage: async (data: CreatePageSchema) => {
+    set({ error: null });
 
-    isCreating: createMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
-    isSavingCanvas: saveCanvasMutation.isPending,
-  };
-};
+    const response = await createPage(data);
+
+    if (response.success && response.data) {
+      set((state) => ({
+        pages: [response.data, ...state.pages],
+      }));
+      return true;
+    }
+
+    set({ error: response.error });
+    return false;
+  },
+
+  removePage: async (id: string, projectId: string) => {
+    set({ error: null });
+
+    const response = await deletePage({ id, projectId });
+
+    if (response.success) {
+      set((state) => ({
+        pages: state.pages.filter((page) => page.id !== id),
+      }));
+      return true;
+    }
+
+    set({ error: response.error });
+    return false;
+  },
+
+  editPage: async (id: string, projectId: string, data: UpdatePageSchema) => {
+    set({ error: null });
+
+    const response = await updatePage({ id, projectId, data });
+
+    if (response.success && response.data) {
+      set((state) => ({
+        pages: state.pages.map((page) =>
+          page.id === id ? response.data : page,
+        ),
+      }));
+      return true;
+    }
+
+    set({ error: response.error });
+    return false;
+  },
+
+  clearError: () => set({ error: null }),
+}));
