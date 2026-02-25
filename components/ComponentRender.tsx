@@ -18,10 +18,31 @@ const validTextTags = [
   "h6",
   "p",
   "span",
+  "a",
+  "label",
+  "blockquote",
+  "div",
+  "strong",
+  "em",
+] as const;
+
+const validCardTags = [
+  "div",
+  "section",
+  "article",
+  "aside",
+  "header",
+  "footer",
+  "nav",
+  "main",
 ] as const;
 
 export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
   const { removeComponent, setSelectedNode, selectedNodeKey } = useCanvas();
+
+  const preventNavIfEditing = (e: React.MouseEvent) => {
+    if (isEditable) e.preventDefault();
+  };
 
   const renderElement = () => {
     switch (no.type) {
@@ -35,33 +56,94 @@ export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
           </>
         );
       }
-      case "Button":
+
+      case "Button": {
+        const href = no.props.href as string | undefined;
+        if (href) {
+          return (
+            <a
+              href={href}
+              className={no.props.className}
+              onClick={preventNavIfEditing}
+            >
+              {no.props.content ?? ""}
+            </a>
+          );
+        }
         return (
           <button className={no.props.className} type="button">
             {no.props.content ?? ""}
           </button>
         );
+      }
+
       case "Text": {
-        const tag = no.props.tag;
-        const Tag =
-          typeof tag === "string" &&
-          validTextTags.includes(tag as (typeof validTextTags)[number])
-            ? (tag as (typeof validTextTags)[number])
-            : "span";
+        const tag = no.props.tag as string;
+        const Tag = validTextTags.includes(tag as any) ? (tag as any) : "span";
+        const href = no.props.href as string | undefined;
+
         return (
-          <Tag className={no.props.className}>{no.props.content ?? ""}</Tag>
+          <Tag
+            className={no.props.className}
+            href={href}
+            onClick={Tag === "a" ? preventNavIfEditing : undefined}
+          >
+            {no.props.content ?? ""}
+          </Tag>
         );
       }
+
+      case "Image": {
+        return (
+          <img
+            src={(no.props.src as string) || "https://via.placeholder.com/150"}
+            alt={(no.props.alt as string) || "Imagem"}
+            className={no.props.className}
+          />
+        );
+      }
+
+      case "Input": {
+        const tag = no.props.tag as string;
+        const type = no.props.type as string;
+        const placeholder = no.props.placeholder as string;
+        const rows = no.props.rows as number | undefined;
+
+        if (tag === "textarea") {
+          return (
+            <textarea
+              className={no.props.className}
+              placeholder={placeholder}
+              rows={rows || 4}
+              readOnly={isEditable}
+            />
+          );
+        }
+
+        return (
+          <input
+            type={type || "text"}
+            className={no.props.className}
+            placeholder={placeholder}
+            readOnly={isEditable}
+          />
+        );
+      }
+
       case "Card": {
         const children = no.children ?? [];
+        const tag = no.props.tag as string;
+        const Tag = validCardTags.includes(tag as any) ? (tag as any) : "div";
+
         return (
-          <div className={no.props.className}>
+          <Tag className={no.props.className}>
             {children.map((child, index) => (
               <ComponentRender key={index} no={child} isEditable={isEditable} />
             ))}
-          </div>
+          </Tag>
         );
       }
+
       default: {
         const children = no.children ?? [];
         if (children.length > 0) {
@@ -104,7 +186,7 @@ export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
           : "hover:outline hover:outline-2 hover:outline-blue-500/50 hover:outline-offset-2"
       }`}
     >
-      <div className="pointer-events-none">{element}</div>
+      <div>{element}</div>
 
       <div
         className={`absolute -top-4 -right-2 flex items-center gap-1 z-50 ${isSelected ? "flex" : "hidden group-hover:flex"}`}

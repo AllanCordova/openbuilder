@@ -51,18 +51,18 @@ export const EditorShell = ({
 
       <div className="w-full flex-1 min-h-0">
         {viewMode === "preview" && (
-          <div className="w-full h-full">
+          <div className="w-full h-full overflow-y-auto">
             <Preview page={page} />
           </div>
         )}
 
         {viewMode === "canva" && (
-          <div className="flex items-start gap-4 w-full h-full">
-            <div className="flex-1 min-w-0 h-full overflow-y-auto">
+          <div className="flex gap-4 w-full h-full min-h-0">
+            <div className="flex-1 min-w-0 h-full overflow-y-auto rounded-md border border-[var(--border-light)]">
               <Canva page={page} />
             </div>
 
-            <aside className="w-80 flex-shrink-0 sticky top-0">
+            <aside className="w-80 h-full flex-shrink-0 flex flex-col min-h-0 bg-[var(--background-alt)] border border-[var(--border-light)] rounded-md overflow-hidden">
               <PropertiesPanel />
             </aside>
           </div>
