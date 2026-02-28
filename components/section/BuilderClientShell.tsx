@@ -52,12 +52,6 @@ export function BuilderClientShell({
       {viewMode === "canva" && (
         <article className="lib-article flex h-full w-[min(20rem,100%)] min-w-[16rem] shrink-0 flex-col border-r border-[var(--border-light)] p-[var(--spacing-dashboard)]">
           <div className="shrink-0">
-            <Link
-              href={`/projects/${projectId}`}
-              className="mb-4 flex items-center gap-2 text-sm text-primary hover:underline"
-            >
-              <ChevronLeft size={16} /> Go out
-            </Link>
             <h1 className="mb-[var(--spacing-dashboard)] text-[var(--text-xl)] font-bold text-foreground">
               Components
             </h1>
@@ -84,7 +78,7 @@ export function BuilderClientShell({
               Edit Page
             </span>
             <h2 className="text-2xl font-bold text-foreground">
-              {pageData?.name || "Página não encontrada"}
+              {pageData?.name}
             </h2>
           </div>
           <div>

@@ -3,17 +3,7 @@ import { generateToken, verifyToken } from "@/lib/token";
 import { cookies } from "next/headers";
 import { ValidationError } from "@/lib/errors";
 import bcrypt from "bcrypt";
-
-export type SignUpData = {
-  name: string;
-  email: string;
-  password: string;
-};
-
-export type SignInData = {
-  email: string;
-  password: string;
-};
+import { SignInData, SignUpData, UpdateData } from "@/types/Auth.dto";
 
 export class AuthService {
   async signUp(data: SignUpData) {
@@ -60,7 +50,7 @@ export class AuthService {
       throw new ValidationError("Invalid credentials");
     }
 
-    const token = await generateToken(user.id);
+    const token = await generateToken(user.email);
     const cookieStore = await cookies();
 
     cookieStore.set("auth_token", token, {
@@ -96,15 +86,35 @@ export class AuthService {
     if (!decoded) return null;
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { email: decoded.email },
       select: {
         id: true,
         name: true,
         email: true,
+        avatar_url: true,
+        createdAt: true,
       },
     });
 
     return user;
+  }
+
+  async updateUser(data: UpdateData) {
+    const user = await this.getCurrentUser();
+
+    if (!user) {
+      throw new ValidationError("Unauthenticated user!");
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: data.name,
+        avatar_url: data.avatar_url,
+      },
+    });
+
+    return updatedUser;
   }
 }
 

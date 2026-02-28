@@ -10,6 +10,7 @@ import Link from "next/link";
 import { ErrorFallback } from "../ui/ErrorFallback";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { toast } from "sonner";
+import { ExportProjectButton } from "./ExportProjectButton";
 
 export const ProjectList = () => {
   const { data: projects = [], isLoading, error } = useProjectsList();
