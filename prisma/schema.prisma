@@ -11,6 +11,7 @@ model User {
   name          String
   email         String    @unique
   password_hash String
+  avatar_url    String?
   createdAt     DateTime  @default(now())
   
   projects      Project[]
