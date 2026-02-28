@@ -2,7 +2,11 @@
 
 import { Wrapper } from "@/lib/wrappers/wrapper";
 import { authService } from "@/service/Auth.service";
-import { signInSchema, signUpSchema } from "@/schemas/Auth.schema";
+import {
+  signInSchema,
+  signUpSchema,
+  updateUserSchema,
+} from "@/schemas/Auth.schema";
 
 export const signUp = Wrapper.publicValidated(signUpSchema, async (data) => {
   return await authService.signUp(data);
@@ -19,3 +23,10 @@ export const signOut = Wrapper.public(async () => {
 export const getCurrentUser = Wrapper.public(async () => {
   return await authService.getCurrentUser();
 });
+
+export const updateProfile = Wrapper.privateValidated(
+  updateUserSchema,
+  async (userId, input) => {
+    return await authService.updateUser(input);
+  },
+);
