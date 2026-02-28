@@ -10,3 +10,19 @@ export type SignInResultDto = {
   email: string;
   token: string;
 };
+
+export type SignUpData = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type SignInData = {
+  email: string;
+  password: string;
+};
+
+export type UpdateData = {
+  name?: string;
+  avatar_url?: string;
+};

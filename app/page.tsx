@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Layout, Sparkles, Code, Zap } from "lucide-react";
-import { Header } from "@/components/ui/Header";
+import { House, Code, Zap, Castle } from "lucide-react";
 
 export default function Home() {
   return (
@@ -8,7 +7,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center p-spacing-lg max-w-canvas mx-auto w-full">
         <section className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <Layout className="text-primary" size={48} strokeWidth={2} />
+            <House className="text-primary" size={48} strokeWidth={2} />
             <h1 className="text-typography-display font-bold text-foreground">
               Open Builder
             </h1>
@@ -41,7 +40,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center p-6 bg-background-alt border border-header rounded-default">
             <div className="bg-primary/10 p-4 rounded-default mb-4">
-              <Layout className="text-primary" size={32} strokeWidth={2} />
+              <Castle className="text-primary" size={32} strokeWidth={2} />
             </div>
             <h2 className="text-typography-heading font-semibold text-foreground mb-2">
               Visual Canvas

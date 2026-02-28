@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Header } from "@/components/ui/Header";
 import { Toaster } from "sonner";
 import { QueryProvider } from "./QueryProvider";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { SidebarClient } from "@/components/ui/SidebarClient";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open Builder",
+  title: "Cadre",
   description: "Build pages visually with drag-and-drop components.",
 };
 
@@ -32,10 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-          <Header />
-          <Toaster richColors closeButton />
-          {children}
-          <ConfirmModal />
+          <SidebarClient>
+            <Toaster richColors closeButton />
+            {children}
+            <ConfirmModal />
+          </SidebarClient>
         </QueryProvider>
       </body>
     </html>

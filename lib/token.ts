@@ -2,8 +2,8 @@ import { SignJWT, jwtVerify } from "jose";
 
 const getSecretKey = () => new TextEncoder().encode(process.env.TOKEN_SECRET!);
 
-export async function generateToken(userId: string): Promise<string> {
-  const token = await new SignJWT({ userId })
+export async function generateToken(email: string): Promise<string> {
+  const token = await new SignJWT({ email })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("24h")
@@ -14,11 +14,11 @@ export async function generateToken(userId: string): Promise<string> {
 
 export async function verifyToken(
   token: string,
-): Promise<{ userId: string } | null> {
+): Promise<{ email: string } | null> {
   try {
     const { payload } = await jwtVerify(token, getSecretKey());
 
-    return { userId: payload.userId as string };
+    return { email: payload.email as string };
   } catch (error) {
     return null;
   }

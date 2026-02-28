@@ -9,6 +9,7 @@ import { CreatePageForm } from "@/components/section/CreatePageForm";
 import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { Spinner } from "@/components/ui/Spinner";
 import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { ExportProjectButton } from "@/components/project/ExportProjectButton";
 
 export default function ProjectDetailPage({
   params,
@@ -45,35 +46,41 @@ export default function ProjectDetailPage({
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 space-y-8">
-        <div className="space-y-4">
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-2 text-primary hover:text-[var(--primary-hover)] transition-colors mb-4"
-          >
-            <ChevronLeft size={18} strokeWidth={2} />
-            <span>Back to Projects</span>
-          </Link>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex-1 flex justify-start">
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-2 text-primary hover:text-[var(--primary-hover)] transition-colors"
+            >
+              <ChevronLeft size={18} strokeWidth={2} />
+              <span className="hidden sm:inline">Back to Projects</span>
+            </Link>
+          </div>
 
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
+          <div className="flex items-center flex-col flex-wrap justify-center gap-x-3 gap-y-1">
+            <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-center">
               {currentProject.name}
             </h1>
-            <p className="text-typography-body text-foreground/70">
-              Created {new Date(currentProject.createdAt).toLocaleDateString()}
-            </p>
+            <span className="text-sm text-typography-body text-foreground/70 whitespace-nowrap">
+              {new Date(currentProject.createdAt).toLocaleDateString()}
+            </span>
           </div>
+
+          <div className="flex-1"></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-3 flex justify-between items-center">
+            <h2 className="text-2xl font-semibold text-foreground">Pages</h2>
+            <ExportProjectButton projectId={id} />
+          </div>
+
           <div className="lg:col-span-1">
             <CreatePageForm projectId={currentProject.id} />
           </div>
 
-          <div className="lg:col-span-2">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-foreground">Pages</h2>
-              <PageList projectId={currentProject.id} />
-            </div>
+          <div className="lg:col-span-2 h-full">
+            <PageList projectId={currentProject.id} />
           </div>
         </div>
       </div>
