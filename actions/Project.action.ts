@@ -25,7 +25,6 @@ export const updateProject = Wrapper.privateValidated(
     data: updateProjectSchema,
   }),
   async (userId, input) => {
-    // A validação de "ensureOwnership" acontece direto no service agora!
     return await projectService.update(userId, input);
   },
 );
@@ -40,8 +39,14 @@ export const getProjectById = Wrapper.privateValidated(
 export const deleteProject = Wrapper.privateValidated(
   z.object({ id: z.string() }),
   async (userId, input) => {
-    // A validação de "ensureOwnership" acontece direto no service agora!
     await projectService.delete(userId, input);
     return { success: true };
+  },
+);
+
+export const downloadProjectZip = Wrapper.privateValidated(
+  z.object({ id: z.string() }),
+  async (userId, input) => {
+    return await projectService.generateProjectZip(userId, input);
   },
 );
