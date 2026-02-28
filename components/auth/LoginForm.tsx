@@ -7,7 +7,7 @@ import { signInSchema, type SignInSchema } from "@/schemas/Auth.schema";
 import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ErrorFallback } from "../ui/ErrorFallback";
 import { useProfileMutations } from "@/hooks/useProfile";
 
@@ -22,6 +22,9 @@ export const LoginForm = () => {
   });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/projects";
 
   const { login } = useProfileMutations();
 
@@ -41,7 +44,7 @@ export const LoginForm = () => {
       return;
     }
 
-    router.push("/");
+    router.push(callbackUrl);
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { UserPlus, Mail, Lock, User, AlertCircle } from "lucide-react";
+import { UserPlus, Mail, Lock, User } from "lucide-react";
 import { signUp } from "@/actions/Auth.action";
 import { signUpSchema, type SignUpSchema } from "@/schemas/Auth.schema";
 import type { ZodIssue } from "zod";
