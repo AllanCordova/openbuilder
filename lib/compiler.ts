@@ -1,11 +1,6 @@
 import { ASTNode } from "@/types/AstNode.type";
 
 function generateReactCodeFromAST(node: ASTNode): string {
-  if (node.type === "root") {
-    const children = node.children || [];
-    return children.map(generateReactCodeFromAST).join("\n");
-  }
-
   const {
     key,
     tag,
@@ -20,57 +15,73 @@ function generateReactCodeFromAST(node: ASTNode): string {
     ...otherProps
   } = node.props || {};
 
-  let propsString = "";
-  if (className) propsString += ` className="${className}"`;
-  if (href) propsString += ` href="${href}"`;
-  if (src) propsString += ` src="${src}"`;
-  if (alt) propsString += ` alt="${alt}"`;
-  if (type) propsString += ` type="${type}"`;
-  if (placeholder) propsString += ` placeholder="${placeholder}"`;
-  if (rows) propsString += ` rows={${rows}}`;
-  const childrenCode = node.children
-    ? node.children.map(generateReactCodeFromAST).join("\n  ")
-    : "";
+  let baseProps = "";
+  if (className) baseProps += ` className="${className}"`;
+
+  const childrenCode =
+    node.children && node.children.length > 0
+      ? node.children.map(generateReactCodeFromAST).join("\n  ")
+      : "";
 
   const innerContent = content || "";
 
   switch (node.type) {
+    case "root": {
+      return `<div${baseProps}>\n  ${childrenCode}\n</div>`;
+    }
+
     case "Button": {
       const isLink = !!href;
       const tagName = isLink ? "a" : "button";
-      return `<${tagName}${propsString}>\n  ${innerContent}\n</${tagName}>`;
+
+      let props = baseProps;
+      if (isLink) props += ` href="${href}"`;
+      else props += ` type="button"`;
+
+      return `<${tagName}${props}>\n  ${innerContent}\n</${tagName}>`;
     }
 
     case "Text": {
       const tagName = tag || "span";
-      return `<${tagName}${propsString}>\n  ${innerContent}\n</${tagName}>`;
+
+      let props = baseProps;
+      if (href && tagName === "a") props += ` href="${href}"`;
+
+      return `<${tagName}${props}>\n  ${innerContent}\n</${tagName}>`;
     }
 
     case "Image": {
-      const fallbackSrc = src || "https://via.placeholder.com/150";
-      const fallbackAlt = alt || "Imagem";
-      return `<img src="${fallbackSrc}" alt="${fallbackAlt}"${propsString} />`;
+      const finalSrc = src || "https://via.placeholder.com/150";
+      const finalAlt = alt || "Imagem";
+
+      return `<img src="${finalSrc}" alt="${finalAlt}"${baseProps} />`;
     }
 
     case "Input": {
       const isTextArea = tag === "textarea";
+
+      let props = baseProps;
+      if (placeholder) props += ` placeholder="${placeholder}"`;
+
       if (isTextArea) {
-        return `<textarea${propsString} />`;
+        if (rows) props += ` rows={${rows}}`;
+        return `<textarea${props} />`;
       }
-      const fallbackType = type || "text";
-      return `<input type="${fallbackType}"${propsString} />`;
+
+      const finalType = type || "text";
+      return `<input type="${finalType}"${props} />`;
     }
 
     case "Card": {
       const tagName = tag || "div";
-      return `<${tagName}${propsString}>\n  ${childrenCode}\n</${tagName}>`;
+      return `<${tagName}${baseProps}>\n  ${childrenCode}\n</${tagName}>`;
     }
 
     default: {
-      if (node.children && node.children.length > 0) {
-        return `<div${propsString}>\n  ${childrenCode}\n</div>`;
+      if (childrenCode) {
+        return `<div${baseProps}>\n  ${childrenCode}\n</div>`;
       }
-      return "";
+      return `<div${baseProps}>${innerContent}</div>`;
     }
   }
 }

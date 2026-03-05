@@ -1,18 +1,32 @@
 "use client";
 
+import {
+  INITIAL_ROOT_NODE,
+  ROOT_NODE_KEY,
+  VOID_ELEMENTS,
+} from "@/constants/AST";
 import { ASTNode } from "@/types/AstNode.type";
 import { create } from "zustand";
+
+export const canHaveChildren = (node: ASTNode): boolean => {
+  const tag = node.props?.tag?.toLowerCase();
+  if (!tag) return true;
+  return !VOID_ELEMENTS.includes(tag);
+};
 
 interface Canvas {
   components: ASTNode[];
   selectedNodeKey: string | null;
+  hoveredNodeKey: string | null;
 
   addComponent: (node: ASTNode) => void;
+  addComponentAtTarget: (targetKey: string, node: ASTNode) => void;
   removeComponent: (key: string) => void;
   updateComponent: (key: string, newProps: Partial<ASTNode["props"]>) => void;
-  moveComponent: (startIndex: number, endIndex: number) => void;
+  moveNodeToTarget: (draggedKey: string, targetKey: string) => void;
 
   setSelectedNode: (key: string | null) => void;
+  setHoveredNode: (key: string | null) => void;
   setComponents: (node: ASTNode[]) => void;
   clearCanvas: () => void;
 }
@@ -93,40 +107,137 @@ export const findParentKey = (
   return null;
 };
 
+export const isKeyInTree = (node: ASTNode, key: string): boolean => {
+  if (node.props?.key === key) return true;
+  if (node.children) {
+    for (const child of node.children) {
+      if (isKeyInTree(child, key)) return true;
+    }
+  }
+  return false;
+};
+
+const extractNodeByKey = (
+  nodes: ASTNode[],
+  keyToExtract: string,
+): { nodes: ASTNode[]; extracted: ASTNode | null } => {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node.props?.key === keyToExtract) {
+      const extracted = node;
+      const newNodes = [...nodes.slice(0, i), ...nodes.slice(i + 1)];
+      return { nodes: newNodes, extracted };
+    }
+    if (node.children?.length) {
+      const { nodes: newChildren, extracted } = extractNodeByKey(
+        node.children,
+        keyToExtract,
+      );
+      if (extracted) {
+        const newNode = { ...node, children: newChildren };
+        const newNodes = nodes.map((n, j) => (j === i ? newNode : n));
+        return { nodes: newNodes, extracted };
+      }
+    }
+  }
+  return { nodes, extracted: null };
+};
+
+const insertNodeByKey = (
+  nodes: ASTNode[],
+  targetKey: string,
+  newNode: ASTNode,
+): ASTNode[] => {
+  return nodes.map((node) => {
+    if (node.props?.key === targetKey) {
+      return {
+        ...node,
+        children: [...(node.children || []), newNode],
+      };
+    }
+    if (node.children && node.children.length > 0) {
+      return {
+        ...node,
+        children: insertNodeByKey(node.children, targetKey, newNode),
+      };
+    }
+    return node;
+  });
+};
+
 export const useCanvas = create<Canvas>((set) => ({
-  components: [],
+  components: [INITIAL_ROOT_NODE],
   selectedNodeKey: null,
+  hoveredNodeKey: null,
 
   addComponent: (node: ASTNode) =>
-    set((state) => ({
-      components: [...state.components, generateKeysForNode(node)],
-    })),
+    set((state) => {
+      const newNode = generateKeysForNode(node);
+      let targetKey = state.selectedNodeKey || ROOT_NODE_KEY;
+      const targetNode = findNodeByKey(state.components, targetKey);
+      if (targetNode && !canHaveChildren(targetNode)) {
+        targetKey = findParentKey(state.components, targetKey) || ROOT_NODE_KEY;
+      }
+      return {
+        components: insertNodeByKey(state.components, targetKey, newNode),
+      };
+    }),
+
+  addComponentAtTarget: (targetKey: string, node: ASTNode) =>
+    set((state) => {
+      const targetNode = findNodeByKey(state.components, targetKey);
+      if (!targetNode || !canHaveChildren(targetNode)) return state;
+      const newNode = generateKeysForNode(node);
+      return {
+        components: insertNodeByKey(state.components, targetKey, newNode),
+      };
+    }),
 
   removeComponent: (key: string) =>
-    set((state) => ({
-      components: removeNodeByKey(state.components, key),
-      selectedNodeKey:
-        state.selectedNodeKey === key ? null : state.selectedNodeKey,
-    })),
+    set((state) => {
+      if (key === ROOT_NODE_KEY) return state;
+
+      return {
+        components: removeNodeByKey(state.components, key),
+        selectedNodeKey:
+          state.selectedNodeKey === key ? null : state.selectedNodeKey,
+      };
+    }),
 
   updateComponent: (key: string, newProps: Partial<ASTNode["props"]>) =>
     set((state) => ({
       components: updateNodeByKey(state.components, key, newProps),
     })),
 
-  moveComponent: (startIndex: number, endIndex: number) =>
+  moveNodeToTarget: (draggedKey: string, targetKey: string) =>
     set((state) => {
-      const reorderedComponents = Array.from(state.components);
-
-      const [movedItem] = reorderedComponents.splice(startIndex, 1);
-
-      reorderedComponents.splice(endIndex, 0, movedItem);
-
-      return { components: reorderedComponents };
+      if (draggedKey === targetKey) return state;
+      if (draggedKey === ROOT_NODE_KEY) return state;
+      const targetNode = findNodeByKey(state.components, targetKey);
+      if (!targetNode || !canHaveChildren(targetNode)) return state;
+      const { nodes: rest, extracted } = extractNodeByKey(
+        state.components,
+        draggedKey,
+      );
+      if (!extracted) return state;
+      if (isKeyInTree(extracted, targetKey)) return state;
+      return {
+        components: insertNodeByKey(rest, targetKey, extracted),
+        selectedNodeKey:
+          state.selectedNodeKey === draggedKey ? targetKey : state.selectedNodeKey,
+      };
     }),
 
   setSelectedNode: (key: string | null) => set({ selectedNodeKey: key }),
 
+  setHoveredNode: (key: string | null) => set({ hoveredNodeKey: key }),
+
   setComponents: (nodes: ASTNode[]) => set({ components: nodes }),
-  clearCanvas: () => set({ components: [], selectedNodeKey: null }),
+
+  clearCanvas: () =>
+    set({
+      components: [INITIAL_ROOT_NODE],
+      selectedNodeKey: null,
+      hoveredNodeKey: null,
+    }),
 }));

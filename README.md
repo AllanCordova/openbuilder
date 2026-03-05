@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Open Builder
 
-## Getting Started
+Visual page builder with drag-and-drop. Create and edit pages from a component library, with a Netflix-style demo (landing and browse with carousels). Built with Next.js, Prisma, PostgreSQL, and Tailwind.
 
-First, run the development server:
+**Educational use only.** This project and its license are the property of Allan Roberto Cordova.
+
+---
+
+## Requirements
+
+- Node.js 18+
+- Docker and Docker Compose (for PostgreSQL)
+- npm or pnpm
+
+## Quick start
+
+### 1. Env and database container
+
+From the project root, run the setup script to create a default `.env` (if missing) and start the PostgreSQL container:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+On Windows, use Git Bash or WSL to run the script.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you prefer to do it manually:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Copy `.env.example` to `.env` and set `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, and `DATABASE_URL` (e.g. `postgresql://USER:PASSWORD@localhost:5432/DATABASE`).
+- Start the stack: `docker-compose up -d`.
 
-## Learn More
+### 2. Prisma
 
-To learn more about Next.js, take a look at the following resources:
+Generate the client, run migrations, and seed the database:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx prisma generate
+npx prisma migrate deploy
+npx prisma db seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For development with migration files: `npx prisma migrate dev` instead of `migrate deploy`.
 
-## Deploy on Vercel
+### 3. App
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Install dependencies and start the dev server:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Commands
+
+| Command | Description |
+|--------|-------------|
+| `./scripts/setup.sh` | Create default `.env` (if missing) and start PostgreSQL container |
+| `docker-compose up -d` | Start PostgreSQL in the background |
+| `docker-compose down` | Stop and remove the container |
+| `npx prisma generate` | Generate Prisma Client |
+| `npx prisma migrate deploy` | Apply migrations (production-style) |
+| `npx prisma migrate dev` | Create/apply migrations in development |
+| `npx prisma db seed` | Run seed (admin user, demo project, pages, component library) |
+| `npm install` | Install dependencies |
+| `npm run dev` | Start Next.js dev server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+
+## License
+
+Proprietary. For educational purposes only. All rights reserved — Allan Cordova!

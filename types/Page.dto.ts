@@ -5,6 +5,7 @@ export interface PageDto {
   slug: string;
   schema_json: any;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreatePageData {

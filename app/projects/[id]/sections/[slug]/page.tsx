@@ -4,7 +4,7 @@ import { EmptyFallback } from "@/components/ui/EmptyFallback";
 
 type PagesDetailsProps = {
   params: Promise<{ id: string; slug: string }>;
-  searchParams: Promise<{ page?: string; limit?: string }>;
+  searchParams: Promise<{ page?: string; limit?: string; tag?: string }>;
 };
 
 export default async function PagesDetailsServer({
@@ -14,13 +14,14 @@ export default async function PagesDetailsServer({
   const { id, slug } = await params;
   const search = await searchParams;
 
-  const page = Number(search.page) || 1;
-  const limit = Number(search.limit) || 10;
+  const componentsRes = await getComponents({
+    page: Number(search.page) || 1,
+    limit: Number(search.limit) || 10,
+    tag: search.tag,
+  });
 
-  const componentsRes = await getComponents({ page, limit });
-
-  if (!componentsRes?.data) {
-    return <EmptyFallback message="Component not found!" />;
+  if (!componentsRes.success || !componentsRes.data) {
+    return <EmptyFallback message="Falha ao carregar componentes." />;
   }
 
   return (

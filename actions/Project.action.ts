@@ -12,6 +12,24 @@ export const getUserProjects = Wrapper.private(async (userId) => {
   return await projectService.getAll(userId);
 });
 
+export const getProjectById = Wrapper.privateValidated(
+  z.object({ id: z.string() }),
+  async (userId, input) => {
+    return await projectService.getById(userId, input);
+  },
+);
+
+export const getPublicProjectsList = Wrapper.public(async () => {
+  return await projectService.getPublicProjects();
+});
+
+export const getPublicProjectById = Wrapper.publicValidated(
+  z.object({ id: z.string() }),
+  async (input) => {
+    return await projectService.getViewableProject(input.id, null);
+  },
+);
+
 export const createProject = Wrapper.privateValidated(
   createProjectSchema,
   async (userId, input) => {
@@ -26,13 +44,6 @@ export const updateProject = Wrapper.privateValidated(
   }),
   async (userId, input) => {
     return await projectService.update(userId, input);
-  },
-);
-
-export const getProjectById = Wrapper.privateValidated(
-  z.object({ id: z.string() }),
-  async (userId, input) => {
-    return await projectService.getById(userId, input);
   },
 );
 
