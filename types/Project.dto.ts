@@ -1,4 +1,4 @@
-import { Page } from "@prisma/client";
+import { Page, User } from "@prisma/client";
 
 export type ProjectDto = {
   id: string;
@@ -11,6 +11,10 @@ export type ProjectDto = {
 
 export interface ProjectWithPagesDto extends ProjectDto {
   pages: Page[];
+}
+
+export interface ProjectWithPagesAndUserDto extends ProjectWithPagesDto {
+  user: User;
 }
 
 export type CreateProjectData = {
