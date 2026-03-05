@@ -39,14 +39,14 @@ export const ExportProjectButton = ({ projectId }: Props) => {
     <button
       onClick={handleExport}
       disabled={isLoading}
-      className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 disabled:opacity-70 transition-colors"
+      className="inline-flex items-center gap-2 bg-primary text-background px-4 py-2.5 rounded-default font-medium text-sm hover:bg-[var(--primary-hover)] disabled:opacity-70 transition-colors"
     >
       {isLoading ? (
         <Loader2 className="animate-spin" size={16} />
       ) : (
         <Download size={16} />
       )}
-      {isLoading ? "Gerando Zip..." : "Exportar Projeto"}
+      {isLoading ? "Exporting…" : "Export project"}
     </button>
   );
 };
