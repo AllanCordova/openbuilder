@@ -4,6 +4,7 @@ import {
   CreateProjectData,
   UpdateProjectData,
   ProjectWithPagesDto,
+  ProjectWithPagesAndUserDto,
 } from "@/types/Project.dto";
 import { BaseService } from "./Base.service";
 import JSZip from "jszip";
@@ -33,6 +34,7 @@ export class ProjectService extends BaseService {
       data: {
         userId,
         name: input.name,
+        isPublic: false,
         build_status: "pending",
       },
     });
@@ -55,6 +57,36 @@ export class ProjectService extends BaseService {
     });
   }
 
+  async getPublicProjects(): Promise<ProjectDto[]> {
+    return await prisma.project.findMany({
+      where: { isPublic: true },
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { name: true, avatar_url: true } } },
+    });
+  }
+
+  async getViewableProject(
+    id: string,
+    userId?: string | null,
+  ): Promise<ProjectWithPagesAndUserDto> {
+    const project = await prisma.project.findFirst({
+      where: {
+        id,
+        OR: [{ isPublic: true }, { userId: userId || undefined }],
+      },
+      include: {
+        pages: true,
+        user: { select: { name: true, avatar_url: true } },
+      },
+    });
+
+    if (!project) {
+      throw new ValidationError("Project not found or is private.");
+    }
+
+    return project as unknown as ProjectWithPagesAndUserDto;
+  }
+
   async generateProjectZip(userId: string, input: GenerateProjectZip) {
     await this.ensureOwnership(prisma.project, input.id, userId);
 
@@ -65,7 +97,7 @@ export class ProjectService extends BaseService {
 
     if (!project) throw new ValidationError("Project not found");
 
-    const zip = this.addPageToZip(project);
+    const zip = this.addPageToZip(project as unknown as ProjectWithPagesDto);
 
     const base64 = await zip.generateAsync({ type: "base64" });
 

@@ -30,7 +30,7 @@ export class PageService extends BaseService {
 
     return await prisma.page.findMany({
       where: { projectId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { updatedAt: "desc" },
     });
   }
 

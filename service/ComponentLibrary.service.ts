@@ -1,26 +1,26 @@
 import prisma from "@/lib/prisma";
+import { BaseService } from "./Base.service";
 import { ComponentLibraryDto } from "@/types/ComponentLibrary.dto";
-import { PaginatedResponse, Paginator } from "@/types/Paginator.type";
+import { PaginatedResponse } from "@/types/Paginator.type";
+import { GetComponentsSchema } from "@/schemas/ComponentLibrary.schema";
 
-export type ComponentLibraryUpdateData = {
-  name?: string;
-  default_schema_json?: object;
-};
-
-export class ComponentLibraryService {
-  async getAll(
-    pagination?: Paginator,
+export class ComponentLibraryService extends BaseService {
+  async getComponents(
+    input: GetComponentsSchema,
   ): Promise<PaginatedResponse<ComponentLibraryDto>> {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
+    const { page, limit, tag } = input;
     const skip = (page - 1) * limit;
+
+    const whereClause = tag ? { tag } : {};
 
     const [components, totalCount] = await prisma.$transaction([
       prisma.componentLibrary.findMany({
         skip,
         take: limit,
+        where: whereClause,
+        orderBy: { name: "asc" },
       }),
-      prisma.componentLibrary.count(),
+      prisma.componentLibrary.count({ where: whereClause }),
     ]);
 
     return {
@@ -32,12 +32,6 @@ export class ComponentLibraryService {
         totalPages: Math.ceil(totalCount / limit),
       },
     };
-  }
-  async update(id: string, data: ComponentLibraryUpdateData) {
-    return await prisma.componentLibrary.update({
-      where: { id },
-      data,
-    });
   }
 }
 
