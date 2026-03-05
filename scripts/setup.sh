@@ -3,23 +3,13 @@ set -e
 cd "$(dirname "$0")/.."
 
 if [ ! -f .env ]; then
-  POSTGRES_USER="${POSTGRES_USER:-postgres}"
-  POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
-  POSTGRES_DB="${POSTGRES_DB:-openbuilder}"
-  DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
-
-  cat > .env << EOF
-POSTGRES_USER=${POSTGRES_USER}
-POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-POSTGRES_DB=${POSTGRES_DB}
-
-DATABASE_URL=${DATABASE_URL}
-
-TOKEN_SECRET=replace-with-a-secret-key-in-production
-UPLOADTHING_SECRET=
-UPLOADTHING_APP_ID=
-EOF
-  echo ".env created with default values."
+  if [ -f .env.example ]; then
+    cp .env.example .env
+    echo ".env created from .env.example."
+  else
+    echo "Error: .env.example not found. Cannot create .env."
+    exit 1
+  fi
 else
   echo ".env already exists; skipping."
 fi
