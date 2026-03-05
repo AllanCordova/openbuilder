@@ -1,36 +1,59 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { FolderKanban } from "lucide-react";
 import { CreateProjectForm } from "@/components/project/CreateProjectForm";
 import { ProjectList } from "@/components/project/ProjectList";
+import { ScrollReveal, AmbientOrbs } from "@/components/landing";
 
 export default function ProjectPage() {
   return (
-    <main className="min-h-screen bg-background">
-      <div className="max-w-canvas mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-typography-display font-bold text-foreground mb-2">
+    <main className="relative min-h-screen bg-background">
+      <AmbientOrbs />
+      {/* Hero */}
+      <section className="relative py-16 px-4 overflow-hidden">
+        <ScrollReveal className="relative z-10 max-w-canvas mx-auto w-full">
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-[var(--header-border)] text-sm font-medium mb-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <FolderKanban size={18} />
+            <span>Your workspace</span>
+          </motion.div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-3">
             Projects
           </h1>
-          <p className="text-typography-body text-muted">
-            Create and manage your projects
+          <p className="text-typography-body text-muted max-w-xl">
+            Create and manage your projects. Open any project to add pages and
+            build with the visual editor.
           </p>
-        </div>
+        </ScrollReveal>
+      </section>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
-          <div className="lg:col-span-1">
-            <CreateProjectForm />
-          </div>
-
-          <div className="lg:col-span-3">
-            <div className="rounded-default border border-header bg-background-alt p-6">
-              <h2 className="text-typography-heading font-semibold text-foreground mb-6">
-                Your Projects
-              </h2>
-              <ProjectList />
+      {/* Create + List */}
+      <section className="relative z-10 px-4 pb-24">
+        <div className="max-w-canvas mx-auto w-full flex flex-col gap-10">
+          <ScrollReveal>
+            <div className="rounded-default border border-[var(--header-border)] bg-background-alt p-6 sm:p-8 max-w-md">
+              <CreateProjectForm />
             </div>
+          </ScrollReveal>
+
+          <div>
+            <motion.h2
+              className="text-typography-heading font-bold text-foreground mb-6"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              Your projects
+            </motion.h2>
+            <ProjectList />
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import {
-  X,
   LayoutDashboard,
   FolderKanban,
   Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Library,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ const navLinks = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Community", href: "/explore", icon: Library },
 ];
 
 export const Sidebar = ({
@@ -33,7 +34,7 @@ export const Sidebar = ({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const { data, isLoading } = useProfile();
   const { logout } = useProfileMutations();
@@ -67,14 +68,18 @@ export const Sidebar = ({
           w-64 ${isCollapsed ? "lg:w-20" : "lg:w-64"}
         `}
       >
-        <div className="flex items-center justify-center p-4 h-16 border-b border-[var(--primary)] shrink-0">
+        <Link
+          href="/"
+          className="flex items-center justify-center p-4 h-16 border-b border-[var(--primary)] shrink-0 hover:opacity-80 transition-opacity"
+          aria-label="Ir para a Home"
+        >
           <span className="text-xl font-bold truncate">
             <span className="lg:hidden text-[var(--primary)]">Cadre</span>
             <span className="hidden lg:inline text-[var(--primary)]">
               {isCollapsed ? "C" : "Cadre"}
             </span>
           </span>
-        </div>
+        </Link>
 
         <div className="hidden lg:flex justify-center p-2 border-b border-[var(--primary)] bg-black/40">
           <button

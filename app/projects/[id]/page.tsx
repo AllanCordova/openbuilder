@@ -1,7 +1,8 @@
 "use client";
 
-import { use } from "react";
-import { ChevronLeft } from "lucide-react";
+import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useProjectByIdQuery } from "@/hooks/useProjects";
 import { PageList } from "@/components/section/PageList";
@@ -10,80 +11,111 @@ import { EmptyFallback } from "@/components/ui/EmptyFallback";
 import { Spinner } from "@/components/ui/Spinner";
 import { ErrorFallback } from "@/components/ui/ErrorFallback";
 import { ExportProjectButton } from "@/components/project/ExportProjectButton";
+import { ReturnFallback } from "@/components/ui/ReturnFallback";
+import { ScrollReveal, AmbientOrbs } from "@/components/landing";
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function ProjectDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
 
   const { data: currentProject, isLoading, error } = useProjectByIdQuery(id);
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner />
+      </div>
+    );
   }
 
   if (error) {
-    return <ErrorFallback error={error.message || "Failed to load project"} />;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background">
+        <ErrorFallback error={error.message || "Failed to load project"} />
+        <ReturnFallback text="Back to projects" href="/projects" />
+      </div>
+    );
   }
 
   if (!currentProject) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background">
         <EmptyFallback message="Project not found" />
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-2 px-4 py-2 mt-4 rounded-default bg-primary text-background hover:bg-[var(--primary-hover)] transition-colors"
-        >
-          <ChevronLeft size={18} strokeWidth={2} />
-          Back to Projects
-        </Link>
+        <ReturnFallback text="Back to projects" href="/projects" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4 space-y-8">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex-1 flex justify-start">
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 text-primary hover:text-[var(--primary-hover)] transition-colors"
+    <main className="relative min-h-screen bg-background">
+      <AmbientOrbs />
+      {/* Hero */}
+      <section className="relative py-16 px-4 overflow-hidden">
+        <div className="relative z-10 max-w-canvas mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <ReturnFallback text="Back to projects" href="/projects" />
+          </motion.div>
+
+          <ScrollReveal className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mt-8">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+                {currentProject.name}
+              </h1>
+              <p className="text-muted mt-1 text-typography-body">
+                {new Date(currentProject.createdAt).toLocaleDateString(
+                  undefined,
+                  {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  },
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={`/projects/${id}/sections`}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-default font-medium text-sm border border-[var(--header-border)] text-foreground hover:border-primary/50 hover:bg-primary/5 transition-colors"
+              >
+                <LayoutGrid size={18} />
+                <span>View gallery</span>
+              </Link>
+              <ExportProjectButton projectId={id} />
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Create + Pages */}
+      <section className="relative z-10 px-4 pb-24">
+        <div className="max-w-canvas mx-auto w-full flex flex-col gap-10">
+          <ScrollReveal>
+            <div className="rounded-default border border-[var(--header-border)] bg-background-alt p-6 sm:p-8 max-w-md">
+              <CreatePageForm projectId={currentProject.id} />
+            </div>
+          </ScrollReveal>
+
+          <div>
+            <motion.div
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <ChevronLeft size={18} strokeWidth={2} />
-              <span className="hidden sm:inline">Back to Projects</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center flex-col flex-wrap justify-center gap-x-3 gap-y-1">
-            <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-center">
-              {currentProject.name}
-            </h1>
-            <span className="text-sm text-typography-body text-foreground/70 whitespace-nowrap">
-              {new Date(currentProject.createdAt).toLocaleDateString()}
-            </span>
-          </div>
-
-          <div className="flex-1"></div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-3 flex justify-between items-center">
-            <h2 className="text-2xl font-semibold text-foreground">Pages</h2>
-            <ExportProjectButton projectId={id} />
-          </div>
-
-          <div className="lg:col-span-1">
-            <CreatePageForm projectId={currentProject.id} />
-          </div>
-
-          <div className="lg:col-span-2 h-full">
-            <PageList projectId={currentProject.id} />
+              <h2 className="text-typography-heading font-bold text-foreground">
+                Pages
+              </h2>
+            </motion.div>
+            <div className="rounded-default border border-[var(--header-border)] bg-background-alt p-6 sm:p-8">
+              <PageList projectId={currentProject.id} />
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
