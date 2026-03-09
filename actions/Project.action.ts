@@ -1,19 +1,22 @@
 "use server";
 
-import { z } from "zod";
 import { Wrapper } from "@/lib/wrappers/wrapper";
-import { projectService } from "@/service/Project.service";
 import {
+  getProjectByIdSchema,
+  getPublicProjectByIdSchema,
   createProjectSchema,
-  updateProjectSchema,
+  updateProjectInputSchema,
+  deleteProjectSchema,
+  downloadProjectZipSchema,
 } from "@/schemas/Project.schema";
+import { projectService } from "@/service/Project.service";
 
 export const getUserProjects = Wrapper.private(async (userId) => {
   return await projectService.getAll(userId);
 });
 
 export const getProjectById = Wrapper.privateValidated(
-  z.object({ id: z.string() }),
+  getProjectByIdSchema,
   async (userId, input) => {
     return await projectService.getById(userId, input);
   },
@@ -24,7 +27,7 @@ export const getPublicProjectsList = Wrapper.public(async () => {
 });
 
 export const getPublicProjectById = Wrapper.publicValidated(
-  z.object({ id: z.string() }),
+  getPublicProjectByIdSchema,
   async (input) => {
     return await projectService.getViewableProject(input.id, null);
   },
@@ -38,17 +41,14 @@ export const createProject = Wrapper.privateValidated(
 );
 
 export const updateProject = Wrapper.privateValidated(
-  z.object({
-    id: z.string(),
-    data: updateProjectSchema,
-  }),
+  updateProjectInputSchema,
   async (userId, input) => {
     return await projectService.update(userId, input);
   },
 );
 
 export const deleteProject = Wrapper.privateValidated(
-  z.object({ id: z.string() }),
+  deleteProjectSchema,
   async (userId, input) => {
     await projectService.delete(userId, input);
     return { success: true };
@@ -56,7 +56,7 @@ export const deleteProject = Wrapper.privateValidated(
 );
 
 export const downloadProjectZip = Wrapper.privateValidated(
-  z.object({ id: z.string() }),
+  downloadProjectZipSchema,
   async (userId, input) => {
     return await projectService.generateProjectZip(userId, input);
   },

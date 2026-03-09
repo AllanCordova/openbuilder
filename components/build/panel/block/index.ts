@@ -6,4 +6,5 @@ export { SpacingBlock } from "./SpacingBlock";
 export { LayoutBlock } from "./LayoutBlock";
 export { ImageBlock } from "./ImageBlock";
 export { InputBlock } from "./InputBlock";
+export { MoveBlock } from "./MoveBlock";
 export { AdvancedBlock } from "./AdvancedBlock";

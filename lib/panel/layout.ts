@@ -1,11 +1,3 @@
-/**
- * Utilities for reading and updating Tailwind layout classes (display, flex, gap, etc.).
- * Used by LayoutControl. Option groups are in constants/properties.ts.
- */
-
-/**
- * Returns the first class from className that is in the group, or "".
- */
 export function getActiveFromGroup(
   className: string,
   group: string[],
@@ -14,10 +6,6 @@ export function getActiveFromGroup(
   return group.find((c) => classes.includes(c)) ?? "";
 }
 
-/**
- * Toggle/set a single option from a group: remove all group classes, then add
- * selectedValue if it wasn't already present (so clicking again removes it).
- */
 export function setClassGroup(
   className: string,
   group: string[],
@@ -30,7 +18,6 @@ export function setClassGroup(
   return rest.join(" ").trim();
 }
 
-/** Returns true when display is flex or inline-flex. */
 export function isFlexLayout(className: string): boolean {
   const active = getActiveFromGroup(className, [
     "block",

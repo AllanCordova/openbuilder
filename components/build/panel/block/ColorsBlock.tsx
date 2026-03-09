@@ -1,6 +1,6 @@
 "use client";
 
-import { ColorPalette } from "../ColorPalette";
+import { ColorControl } from "../control/ColorControl";
 
 type ColorsBlockProps = {
   currentClassName: string;
@@ -10,13 +10,13 @@ type ColorsBlockProps = {
 export function ColorsBlock({ currentClassName, onChange }: ColorsBlockProps) {
   return (
     <div className="flex flex-col gap-4">
-      <ColorPalette
+      <ColorControl
         label="Background"
         type="bg"
         currentClassName={currentClassName}
         onChange={onChange}
       />
-      <ColorPalette
+      <ColorControl
         label="Text"
         type="text"
         currentClassName={currentClassName}

@@ -3,7 +3,7 @@
 import { Canva } from "@/components/build/Canva";
 import { Preview } from "@/components/build/Preview";
 import { PageDto } from "@/types/Page.dto";
-import { PropertiesPanel } from "../build/PropertiesPanel";
+import { PropertiesPanel } from "./panel/PropertiesPanel";
 
 type PagesDetailsProps = {
   page: PageDto;
@@ -11,7 +11,7 @@ type PagesDetailsProps = {
   onViewChange: (mode: "preview" | "canva") => void;
 };
 
-export const EditorShell = ({
+export const Mode = ({
   page,
   viewMode,
   onViewChange,

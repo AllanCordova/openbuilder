@@ -1,6 +1,6 @@
 import { schemaToASTNode } from "@/types/AstNode.type";
 import { Page } from "@prisma/client";
-import { ComponentRender } from "../ComponentRender";
+import { ComponentRender } from "./ComponentRender";
 
 type PropsType = {
   page: Page;

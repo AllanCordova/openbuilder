@@ -4,6 +4,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { ASTNode } from "@/types/AstNode.type";
 import { useCanvas, canHaveChildren } from "@/hooks/useCanvas";
 import { ROOT_NODE_KEY } from "@/constants/AST";
+
 import { Trash2, Edit2 } from "lucide-react";
 import { validTextTags, validCardTags } from "@/constants/AST";
 
@@ -11,8 +12,6 @@ type PropsType = {
   no: ASTNode;
   isEditable?: boolean;
 };
-
-
 
 export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
   const {
@@ -29,14 +28,13 @@ export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
   const droppableId = nodeKey ?? ROOT_NODE_KEY;
   const isContainer = canHaveChildren(no);
 
-  const { setNodeRef: setDraggableRef, attributes, listeners, isDragging } =
-    useDraggable({
-      id: droppableId,
-      data: isRoot
-        ? undefined
-        : { type: "canvas" as const, nodeKey: nodeKey!, nodeType: no.type },
-      disabled: isRoot,
-    });
+  const { setNodeRef: setDraggableRef, isDragging } = useDraggable({
+    id: droppableId,
+    data: isRoot
+      ? undefined
+      : { type: "canvas" as const, nodeKey: nodeKey!, nodeType: no.type },
+    disabled: true,
+  });
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: droppableId,
     disabled: !isContainer,
@@ -72,15 +70,33 @@ export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
     switch (no.type) {
       case "root": {
         const children = no.children ?? [];
+        const isEmpty = children.length === 0;
         return (
           <div className={`${no.props.className ?? ""} ${editorClass}`}>
-            {children.map((child, index) => (
-              <ComponentRender
-                key={(child.props?.key as string) ?? index}
-                no={child}
-                isEditable={isEditable}
-              />
-            ))}
+            {isEmpty ? (
+              <div
+                className="flex flex-col items-center justify-center gap-3 min-h-[280px] rounded-[var(--radius-md)] border-2 border-dashed border-[var(--border-light)] bg-[var(--background)]/50 text-center p-6"
+                style={{
+                  fontSize: "var(--text-sm)",
+                  color: "var(--muted)",
+                }}
+              >
+                <p className="font-medium text-foreground/80">
+                  Drag components from the library here
+                </p>
+                <p className="text-muted">
+                  Drop in this area to add to the canvas
+                </p>
+              </div>
+            ) : (
+              children.map((child, index) => (
+                <ComponentRender
+                  key={(child.props?.key as string) ?? index}
+                  no={child}
+                  isEditable={isEditable}
+                />
+              ))
+            )}
           </div>
         );
       }
@@ -202,16 +218,17 @@ export const ComponentRender = ({ no, isEditable = false }: PropsType) => {
     <div
       ref={setNodeRef}
       {...(nodeKey ? { "data-node-key": nodeKey } : {})}
-      className={`group relative overflow-visible transition-[box-shadow,outline] rounded-[var(--radius-default)] ${selectionRingClass} ${dropZoneClass} ${draggingClass} ${!isRoot ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
+      className={`group relative overflow-visible transition-[box-shadow,outline] rounded-[var(--radius-default)] ${selectionRingClass} ${dropZoneClass} ${draggingClass} cursor-pointer`}
       onClick={(e) => {
         e.stopPropagation();
         if (nodeKey) setSelectedNode(nodeKey);
       }}
       onMouseMove={isRoot ? handleRootMouseMove : undefined}
       onMouseLeave={isRoot ? () => setHoveredNode(null) : undefined}
-      {...(isRoot ? {} : { ...listeners, ...attributes })}
     >
-      <div className={isRoot ? "w-full min-h-[120px]" : "min-w-0"}>{element}</div>
+      <div className={isRoot ? "w-full min-h-[120px]" : "min-w-0"}>
+        {element}
+      </div>
 
       <div
         className={`absolute flex items-center gap-1 z-[60] ${

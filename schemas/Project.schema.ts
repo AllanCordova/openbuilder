@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const getProjectByIdSchema = z.object({
+  id: z.string(),
+});
+
+export const getPublicProjectByIdSchema = z.object({
+  id: z.string(),
+});
+
 export const createProjectSchema = z.object({
   name: z
     .string()
@@ -18,5 +26,23 @@ export const updateProjectSchema = z.object({
   source_code_url: z.string().optional(),
 });
 
+export const updateProjectInputSchema = z.object({
+  id: z.string(),
+  data: updateProjectSchema,
+});
+
+export const deleteProjectSchema = z.object({
+  id: z.string(),
+});
+
+export const downloadProjectZipSchema = z.object({
+  id: z.string(),
+});
+
+export type GetProjectByIdSchema = z.infer<typeof getProjectByIdSchema>;
+export type GetPublicProjectByIdSchema = z.infer<typeof getPublicProjectByIdSchema>;
 export type CreateProjectSchema = z.infer<typeof createProjectSchema>;
 export type UpdateProjectSchema = z.infer<typeof updateProjectSchema>;
+export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
+export type DeleteProjectSchema = z.infer<typeof deleteProjectSchema>;
+export type DownloadProjectZipSchema = z.infer<typeof downloadProjectZipSchema>;

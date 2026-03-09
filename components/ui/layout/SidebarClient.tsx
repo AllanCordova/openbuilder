@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/components/ui/Sidebar";
-import { Header } from "@/components/ui/Header";
+import { Sidebar } from "@/components/ui/layout/Sidebar";
+import { Header } from "@/components/ui/layout/Header";
 
 export function SidebarClient({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

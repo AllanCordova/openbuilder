@@ -1,19 +1,25 @@
 "use server";
 
-import { z } from "zod";
 import { Wrapper } from "@/lib/wrappers/wrapper";
+import {
+  getProjectPagesSchema,
+  getPageBySlugSchema,
+  createPageSchema,
+  savePageCanvasSchema,
+  updatePageInputSchema,
+  deletePageSchema,
+} from "@/schemas/Page.schema";
 import { pageService } from "@/service/Page.service";
-import { createPageSchema, updatePageSchema } from "@/schemas/Page.schema";
 
 export const getProjectPages = Wrapper.privateValidated(
-  z.object({ projectId: z.string() }),
+  getProjectPagesSchema,
   async (userId, input) => {
     return await pageService.getByProjectId(userId, input.projectId);
   },
 );
 
 export const getPageBySlug = Wrapper.privateValidated(
-  z.object({ projectId: z.string(), slug: z.string() }),
+  getPageBySlugSchema,
   async (userId, input) => {
     return await pageService.getBySlug(userId, input);
   },
@@ -27,32 +33,21 @@ export const createPage = Wrapper.privateValidated(
 );
 
 export const savePageCanvas = Wrapper.privateValidated(
-  z.object({
-    id: z.string(),
-    projectId: z.string(),
-    schema: z.any(),
-  }),
+  savePageCanvasSchema,
   async (userId, input) => {
     return await pageService.saveCanvas(userId, input);
   },
 );
 
 export const updatePage = Wrapper.privateValidated(
-  z.object({
-    id: z.string(),
-    projectId: z.string(),
-    data: updatePageSchema,
-  }),
+  updatePageInputSchema,
   async (userId, input) => {
     return await pageService.update(userId, input);
   },
 );
 
 export const deletePage = Wrapper.privateValidated(
-  z.object({
-    id: z.string(),
-    projectId: z.string(),
-  }),
+  deletePageSchema,
   async (userId, input) => {
     await pageService.delete(userId, input);
     return { success: true };
