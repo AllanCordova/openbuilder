@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutControl } from "../LayoutControl";
+import { LayoutControl } from "../control/LayoutControl";
 
 type LayoutBlockProps = {
   currentClassName: string;

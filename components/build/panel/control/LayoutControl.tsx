@@ -14,7 +14,7 @@ import {
   getActiveFromGroup,
   setClassGroup,
   isFlexLayout,
-} from "@/lib/layoutClassName";
+} from "@/lib/panel/layout";
 
 type LayoutControlProps = {
   currentClassName: string;
