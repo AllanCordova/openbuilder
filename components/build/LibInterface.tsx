@@ -1,8 +1,7 @@
 "use client";
 
 import { useCanvas } from "@/hooks/useCanvas";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
-import { ASTNode, schemaToASTNode } from "@/types/AstNode.type";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 import { ComponentLibraryDto } from "@/types/ComponentLibrary.dto";
 import { Filter, FilterOption } from "@/components/ui/Filter";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -21,16 +20,12 @@ type PropsType = {
 };
 
 export const LibInterface = ({ components }: PropsType) => {
-  const { addComponent } = useCanvas();
+  useCanvas();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const activeTag = searchParams.get("tag") || "";
-
-  const handleAdd = (node: ASTNode) => () => {
-    addComponent(node);
-  };
 
   const handleFilterChange = (tag: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -72,7 +67,6 @@ export const LibInterface = ({ components }: PropsType) => {
               id={c.id}
               name={c.name}
               schema={c.default_schema_json}
-              onAddClick={handleAdd(schemaToASTNode(c.default_schema_json))}
             />
           ))}
         </ul>

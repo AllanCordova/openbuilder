@@ -117,6 +117,54 @@ export const isKeyInTree = (node: ASTNode, key: string): boolean => {
   return false;
 };
 
+export type MoveTarget = { key: string; label: string };
+
+const CANVAS_ROOT_LABEL = "Canvas";
+
+export function getValidMoveTargets(
+  nodes: ASTNode[],
+  selectedKey: string,
+  pathPrefix = CANVAS_ROOT_LABEL,
+): MoveTarget[] {
+  const selectedNode = findNodeByKey(nodes, selectedKey);
+  if (!selectedNode) return [];
+
+  const result: MoveTarget[] = [];
+
+  for (const node of nodes) {
+    const key = node.props?.key as string | undefined;
+    if (!key || key === selectedKey) continue;
+    if (selectedNode && isKeyInTree(selectedNode, key)) continue;
+    if (!canHaveChildren(node)) continue;
+
+    const displayName =
+      node.type === "root"
+        ? CANVAS_ROOT_LABEL
+        : (node.props?.dataLabel as string) || node.type;
+    const label =
+      pathPrefix === CANVAS_ROOT_LABEL && node.type === "root"
+        ? CANVAS_ROOT_LABEL
+        : pathPrefix === CANVAS_ROOT_LABEL
+          ? `${CANVAS_ROOT_LABEL} › ${displayName}`
+          : `${pathPrefix} › ${displayName}`;
+    result.push({ key, label });
+
+    if (node.children?.length) {
+      const nextPrefix =
+        node.type === "root"
+          ? pathPrefix
+          : pathPrefix === CANVAS_ROOT_LABEL
+            ? displayName
+            : `${pathPrefix} › ${displayName}`;
+      result.push(
+        ...getValidMoveTargets(node.children, selectedKey, nextPrefix),
+      );
+    }
+  }
+
+  return result;
+}
+
 const extractNodeByKey = (
   nodes: ASTNode[],
   keyToExtract: string,

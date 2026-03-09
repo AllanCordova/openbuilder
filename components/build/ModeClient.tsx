@@ -5,7 +5,6 @@ import {
   DndContext,
   DragEndEvent,
   DragStartEvent,
-  DragCancelEvent,
   DragOverlay,
   useSensors,
   useSensor,
@@ -14,42 +13,21 @@ import {
 } from "@dnd-kit/core";
 import { LibInterface } from "@/components/build/LibInterface";
 import { SavePage } from "@/components/section/SavePage";
-import { EditorShell } from "@/components/section/EditorShell";
+import { Mode } from "@/components/build/Mode";
 import { PaginatedResponse } from "@/types/Paginator.type";
 import { ComponentLibraryDto } from "@/types/ComponentLibrary.dto";
 import { PaginatorActions } from "../ui/PaginatorActions";
 import { usePageBySlugQuery } from "@/hooks/usePages";
-import { EmptyFallback } from "../ui/EmptyFallback";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { EmptyFallback } from "../ui/fallback/EmptyFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 import { Spinner } from "../ui/Spinner";
-import { ReturnFallback } from "../ui/ReturnFallback";
+import { ReturnFallback } from "../ui/fallback/ReturnFallback";
 import { useCanvas } from "@/hooks/useCanvas";
 import { schemaToASTNode } from "@/types/AstNode.type";
 import {
   type LibraryItemDragData,
   LibraryItemDragPreview,
 } from "@/components/build/DraggableLibraryItem";
-import { GripVertical } from "lucide-react";
-
-export type CanvasItemDragData = {
-  type: "canvas";
-  nodeKey: string;
-  nodeType: string;
-};
-
-function CanvasItemDragPreview({ nodeType }: { nodeType: string }) {
-  return (
-    <div
-      className="flex items-center gap-2 py-2 px-3 rounded-[var(--radius-md)] border-2 border-primary bg-[var(--background-alt)] shadow-lg cursor-grabbing min-w-[10rem]"
-      role="presentation"
-    >
-      <GripVertical size={16} className="shrink-0 text-muted" aria-hidden />
-      <span className="text-[length:var(--text-sm)] text-foreground font-medium">
-        Moving: {nodeType}
-      </span>
-    </div>
-  );
-}
 
 type BuilderClientShellProps = {
   projectId: string;
@@ -58,7 +36,7 @@ type BuilderClientShellProps = {
   paginationMeta: PaginatedResponse<ComponentLibraryDto>["meta"];
 };
 
-export function BuilderClientShell({
+export function ModeClient({
   projectId,
   slug,
   initialComponents,
@@ -67,9 +45,7 @@ export function BuilderClientShell({
   const [viewMode, setViewMode] = useState<"preview" | "canva">("canva");
   const [activeLibraryDrag, setActiveLibraryDrag] =
     useState<LibraryItemDragData | null>(null);
-  const [activeCanvasDrag, setActiveCanvasDrag] =
-    useState<CanvasItemDragData | null>(null);
-  const { addComponentAtTarget, moveNodeToTarget } = useCanvas();
+  const { addComponentAtTarget } = useCanvas();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -80,44 +56,44 @@ export function BuilderClientShell({
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
-    if (data && typeof data === "object" && "type" in data) {
-      if (data.type === "library")
-        setActiveLibraryDrag(data as LibraryItemDragData);
-      if (data.type === "canvas" && "nodeKey" in data && "nodeType" in data)
-        setActiveCanvasDrag(data as CanvasItemDragData);
-    }
+    if (data && typeof data === "object" && "type" in data && data.type === "library")
+      setActiveLibraryDrag(data as LibraryItemDragData);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveLibraryDrag(null);
-    setActiveCanvasDrag(null);
 
     if (!over) return;
 
     const data = active.data.current;
     const targetKey = String(over.id);
 
-    if (data && typeof data === "object" && "type" in data) {
-      if (data.type === "library" && "schema" in data && data.schema) {
-        addComponentAtTarget(targetKey, schemaToASTNode(data.schema));
-        return;
-      }
-      if (
-        data.type === "canvas" &&
-        "nodeKey" in data &&
-        typeof data.nodeKey === "string"
-      ) {
-        if (data.nodeKey === targetKey) return;
-        moveNodeToTarget(data.nodeKey, targetKey);
-      }
+    if (
+      data &&
+      typeof data === "object" &&
+      "type" in data &&
+      data.type === "library" &&
+      "schema" in data &&
+      data.schema
+    ) {
+      const schemaNode = schemaToASTNode(data.schema);
+      const displayName =
+        typeof (data as { name?: string }).name === "string"
+          ? (data as { name: string }).name
+          : null;
+      const nodeWithLabel =
+        displayName && schemaNode.props
+          ? {
+              ...schemaNode,
+              props: { ...schemaNode.props, dataLabel: displayName },
+            }
+          : schemaNode;
+      addComponentAtTarget(targetKey, nodeWithLabel);
     }
   };
 
-  const handleDragCancel = () => {
-    setActiveLibraryDrag(null);
-    setActiveCanvasDrag(null);
-  };
+  const handleDragCancel = () => setActiveLibraryDrag(null);
 
   const {
     data: pageData,
@@ -199,7 +175,7 @@ export function BuilderClientShell({
           </header>
 
           <div className="relative w-full min-h-0 flex-1">
-            <EditorShell
+            <Mode
               page={pageData}
               viewMode={viewMode}
               onViewChange={setViewMode}
@@ -211,8 +187,6 @@ export function BuilderClientShell({
       <DragOverlay dropAnimation={null}>
         {activeLibraryDrag ? (
           <LibraryItemDragPreview name={activeLibraryDrag.name} />
-        ) : activeCanvasDrag ? (
-          <CanvasItemDragPreview nodeType={activeCanvasDrag.nodeType} />
         ) : null}
       </DragOverlay>
     </DndContext>

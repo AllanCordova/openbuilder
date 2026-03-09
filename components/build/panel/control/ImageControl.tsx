@@ -11,7 +11,7 @@ import {
   setWidthPreset,
   setObjectFit,
   setCustomWidthClasses,
-} from "@/lib/imageClassName";
+} from "@/lib/panel/image";
 
 const inputClassName =
   "w-full px-3 py-2 bg-[var(--background)] border border-[var(--border-light)] rounded-default text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-colors text-foreground placeholder:text-muted";

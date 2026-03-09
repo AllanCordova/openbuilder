@@ -1,6 +1,6 @@
 "use client";
 
-import { SpacingControl } from "../SpacingControl";
+import { SpacingControl } from "../control/SpacingControl";
 
 type SpacingBlockProps = {
   currentClassName: string;

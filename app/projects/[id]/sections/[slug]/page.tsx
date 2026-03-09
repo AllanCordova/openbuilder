@@ -1,6 +1,6 @@
 import { getComponents } from "@/actions/ComponentLibrary.action";
-import { BuilderClientShell } from "@/components/section/BuilderClientShell";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
+import { ModeClient } from "@/components/build/ModeClient";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 
 type PagesDetailsProps = {
   params: Promise<{ id: string; slug: string }>;
@@ -25,7 +25,7 @@ export default async function PagesDetailsServer({
   }
 
   return (
-    <BuilderClientShell
+    <ModeClient
       projectId={id}
       slug={slug}
       initialComponents={componentsRes.data.data}

@@ -1,35 +1,17 @@
 "use client";
 
+import { SPACING_SIZES } from "@/constants/properties";
+import { getSpacingValue, setSpacing } from "@/lib/panel/spacing";
+
 type SpacingControlProps = {
   currentClassName: string;
   onChange: (newClassName: string) => void;
 };
 
-const SPACING_SIZES = ["0", "1", "2", "4", "6", "8", "12", "16", "24", "32"];
-
 export const SpacingControl = ({
   currentClassName,
   onChange,
 }: SpacingControlProps) => {
-  const getSpacingValue = (prefix: string) => {
-    const regex = new RegExp(`\\b${prefix}-([a-zA-Z0-9]+)\\b`);
-    const match = currentClassName.match(regex);
-    return match ? match[1] : "";
-  };
-
-  const handleSpacingChange = (prefix: string, value: string) => {
-    let classes = (currentClassName || "").split(/\s+/).filter(Boolean);
-
-    const regex = new RegExp(`^${prefix}-[a-zA-Z0-9]+$`);
-    classes = classes.filter((c) => !regex.test(c));
-
-    if (value !== "") {
-      classes.push(`${prefix}-${value}`);
-    }
-
-    onChange(classes.join(" "));
-  };
-
   const SpacingSelect = ({
     label,
     prefix,
@@ -37,7 +19,7 @@ export const SpacingControl = ({
     label: string;
     prefix: string;
   }) => {
-    const currentValue = getSpacingValue(prefix);
+    const currentValue = getSpacingValue(currentClassName, prefix);
 
     return (
       <div className="flex flex-col gap-1 w-full">
@@ -45,7 +27,9 @@ export const SpacingControl = ({
         <select
           className="w-full px-2 py-1.5 bg-[var(--background)] border border-[var(--border-light)] rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] text-foreground"
           value={currentValue}
-          onChange={(e) => handleSpacingChange(prefix, e.target.value)}
+          onChange={(e) =>
+            onChange(setSpacing(currentClassName, prefix, e.target.value))
+          }
         >
           <option value="">-</option>
           {SPACING_SIZES.map((size) => (

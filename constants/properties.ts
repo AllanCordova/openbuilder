@@ -1,7 +1,3 @@
-/**
- * Constants for the properties panel (layout, image, etc.).
- */
-
 export const LAYOUT_DISPLAY_OPTIONS = ["block", "flex", "grid", "hidden"];
 export const LAYOUT_DIRECTION_OPTIONS = ["flex-row", "flex-col"];
 export const LAYOUT_JUSTIFY_OPTIONS = [
@@ -28,6 +24,108 @@ export const LAYOUT_GAP_OPTIONS = [
 export const LAYOUT_WRAP_OPTIONS = ["flex-nowrap", "flex-wrap"];
 export const LAYOUT_GROW_OPTIONS = ["grow-0", "grow"];
 export const LAYOUT_SHRINK_OPTIONS = ["shrink-0", "shrink"];
+
+export const SPACING_SIZES = [
+  "0",
+  "1",
+  "2",
+  "4",
+  "6",
+  "8",
+  "12",
+  "16",
+  "24",
+  "32",
+];
+
+export type ColorPaletteItem = {
+  name: string;
+  bgClass: string;
+  textClass: string;
+  hex: string;
+};
+
+export const COLOR_PALETTE: ColorPaletteItem[] = [
+  { name: "Nenhuma", bgClass: "", textClass: "", hex: "transparent" },
+  {
+    name: "Fundo",
+    bgClass: "bg-background",
+    textClass: "text-background",
+    hex: "var(--background)",
+  },
+  {
+    name: "Fundo Alt",
+    bgClass: "bg-background-alt",
+    textClass: "text-background-alt",
+    hex: "var(--background-alt)",
+  },
+  {
+    name: "Primária",
+    bgClass: "bg-primary",
+    textClass: "text-primary",
+    hex: "var(--primary)",
+  },
+  {
+    name: "Secundária",
+    bgClass: "bg-secondary",
+    textClass: "text-secondary",
+    hex: "var(--secondary)",
+  },
+  {
+    name: "Destrutiva",
+    bgClass: "bg-destructive",
+    textClass: "text-destructive",
+    hex: "var(--destructive)",
+  },
+  {
+    name: "Suave",
+    bgClass: "bg-muted",
+    textClass: "text-muted",
+    hex: "var(--muted)",
+  },
+  {
+    name: "Texto",
+    bgClass: "bg-foreground",
+    textClass: "text-foreground",
+    hex: "var(--foreground)",
+  },
+  {
+    name: "Branco",
+    bgClass: "bg-white",
+    textClass: "text-white",
+    hex: "#ffffff",
+  },
+  {
+    name: "Preto",
+    bgClass: "bg-black",
+    textClass: "text-black",
+    hex: "#000000",
+  },
+  {
+    name: "Azul",
+    bgClass: "bg-blue-500",
+    textClass: "text-blue-500",
+    hex: "#3b82f6",
+  },
+  {
+    name: "Verde",
+    bgClass: "bg-green-500",
+    textClass: "text-green-500",
+    hex: "#22c55e",
+  },
+  {
+    name: "Vermelho",
+    bgClass: "bg-red-500",
+    textClass: "text-red-500",
+    hex: "#ef4444",
+  },
+  {
+    name: "Amarelo",
+    bgClass: "bg-yellow-500",
+    textClass: "text-yellow-500",
+    hex: "#eab308",
+  },
+];
 
 export const IMAGE_SIZE_PRESETS: { label: string; className: string }[] = [
   { label: "Full", className: "w-full" },

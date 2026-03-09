@@ -1,7 +1,7 @@
 "use client";
 
 import { useCanvas, findNodeByKey } from "@/hooks/useCanvas";
-import { EmptyFallback } from "../ui/EmptyFallback";
+import { EmptyFallback } from "../../ui/fallback/EmptyFallback";
 import {
   PanelBlock,
   TextBlock,
@@ -11,8 +11,9 @@ import {
   LayoutBlock,
   ImageBlock,
   InputBlock,
+  MoveBlock,
   AdvancedBlock,
-} from "./panel";
+} from "./block";
 import {
   Type,
   Link2,
@@ -22,6 +23,7 @@ import {
   Image as ImageIcon,
   FileInput,
   Code,
+  ArrowLeftRight,
 } from "lucide-react";
 export const PropertiesPanel = () => {
   const { selectedNodeKey, components, updateComponent } = useCanvas();
@@ -136,6 +138,10 @@ export const PropertiesPanel = () => {
             />
           </PanelBlock>
         )}
+
+        <PanelBlock title="Move" icon={ArrowLeftRight} defaultOpen={false}>
+          <MoveBlock />
+        </PanelBlock>
 
         <PanelBlock title="Advanced" icon={Code} defaultOpen={false}>
           <AdvancedBlock className={className} onChange={setClassName} />

@@ -8,7 +8,6 @@ import {
   UploadCloud,
   ImageIcon,
   Trash2,
-  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ZodIssue } from "zod";
@@ -18,7 +17,7 @@ import { updateProfile } from "@/actions/Auth.action";
 import { updateUserSchema, type UpdateUserSchema } from "@/schemas/Auth.schema";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { useProfile } from "@/hooks/useProfile";
 import { useImageUpload } from "@/hooks/useImageUpload";
 
@@ -74,41 +73,31 @@ export function UserUpdate() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4">
-      <div className="relative w-full max-w-md">
-        {(isSubmitting || isLoading) && (
-          <div
-            className="absolute inset-0 z-10 flex items-center justify-center rounded-default bg-background/80 backdrop-blur-sm"
-            aria-live="polite"
-          >
-            <Spinner />
-          </div>
-        )}
-
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-6 w-full p-8 bg-background-alt border border-header rounded-default shadow-sm"
+    <div className="relative w-full">
+      {(isSubmitting || isLoading) && (
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center rounded-default bg-background/80 backdrop-blur-sm"
+          aria-live="polite"
         >
-          <div className="relative flex flex-col items-center gap-2 mb-2 text-center">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="absolute left-0 top-0 p-2 -ml-2 text-muted hover:text-foreground hover:bg-background/50 rounded-default transition-colors"
-              title="Go back"
-            >
-              <ArrowLeft size={20} strokeWidth={2} />
-            </button>
+          <Spinner />
+        </div>
+      )}
 
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 mt-2">
-              <User size={28} strokeWidth={2} />
-            </div>
-            <h2 className="text-typography-display font-semibold text-foreground">
-              Edit Profile
-            </h2>
-            <p className="text-typography-body text-muted">
-              Update your personal information and avatar
-            </p>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-6 w-full p-6 sm:p-8 bg-background-alt border border-[var(--header-border)] rounded-default shadow-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+      >
+        <div className="flex flex-col items-center gap-2 mb-2 text-center">
+          <div className="w-14 h-14 rounded-default bg-primary/10 flex items-center justify-center text-primary mb-2">
+            <User size={28} strokeWidth={2} />
           </div>
+          <h2 className="text-xl font-semibold text-foreground">
+            Your details
+          </h2>
+          <p className="text-typography-body text-muted text-sm">
+            Change your name and profile picture
+          </p>
+        </div>
 
           {errors.root && <ErrorFallback error={errors.root.message} />}
 
@@ -119,12 +108,12 @@ export function UserUpdate() {
 
             <div className="flex flex-col items-center justify-center gap-4 w-full">
               {isUploadingFile ? (
-                <div className="w-full h-40 flex flex-col items-center justify-center rounded-default border-2 border-dashed border-border-light bg-background shadow-sm">
+                <div className="w-full h-40 flex flex-col items-center justify-center rounded-default border-2 border-dashed border-[var(--header-border)] bg-background">
                   <Spinner />
                 </div>
               ) : currentAvatar ? (
                 <div className="flex flex-col items-center gap-3 w-full">
-                  <div className="relative w-32 h-32 rounded-default overflow-hidden border-2 border-border-light bg-background shadow-sm mx-auto">
+                  <div className="relative w-32 h-32 rounded-default overflow-hidden border-2 border-[var(--header-border)] bg-background mx-auto">
                     <Image
                       src={currentAvatar}
                       alt="Avatar preview"
@@ -144,7 +133,7 @@ export function UserUpdate() {
                   </button>
                 </div>
               ) : (
-                <label className="w-full max-w-[280px] h-40 mx-auto flex flex-col items-center justify-center rounded-default border-2 border-dashed border-border-light bg-background hover:bg-background/50 hover:border-primary transition-all cursor-pointer shadow-sm group">
+                <label className="w-full max-w-[280px] h-40 mx-auto flex flex-col items-center justify-center rounded-default border-2 border-dashed border-[var(--header-border)] bg-background hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
                   <input
                     type="file"
                     accept="image/*"
@@ -186,13 +175,12 @@ export function UserUpdate() {
           <button
             type="submit"
             disabled={isSubmitting || isLoading || isUploadingFile}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 py-3 rounded-default font-medium text-typography-body bg-primary text-background hover:bg-[var(--primary-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 py-3.5 rounded-default font-semibold text-typography-body bg-primary text-background hover:bg-[var(--primary-hover)] transition-all shadow-lg hover:shadow-[var(--shadow-primary)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <Save size={20} strokeWidth={2} />
             <span>{isSubmitting ? "Saving Changes..." : "Save Changes"}</span>
           </button>
         </form>
-      </div>
     </div>
   );
 }

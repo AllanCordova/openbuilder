@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { ProjectDto } from "@/types/Project.dto";
 import { useProjectMutations } from "@/hooks/useProjects";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 import { toast } from "sonner";
 
 type EditProjectModalProps = {

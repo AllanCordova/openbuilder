@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { QueryProvider } from "./QueryProvider";
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { SidebarClient } from "@/components/ui/SidebarClient";
+import { ConfirmModal } from "@/components/ui/modal/ConfirmModal";
+import { SidebarClient } from "@/components/ui/layout/SidebarClient";
 import "./globals.css";
 
 const geistSans = Geist({

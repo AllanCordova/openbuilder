@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageControl } from "../ImageControl";
+import { ImageControl } from "../control/ImageControl";
 
 type ImageBlockProps = {
   src?: string;

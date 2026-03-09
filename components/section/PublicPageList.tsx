@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { FileText, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 import type { PageDto } from "@/types/Page.dto";
 
 type PublicPageListProps = {
