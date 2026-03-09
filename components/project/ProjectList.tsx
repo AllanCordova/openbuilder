@@ -11,10 +11,10 @@ import {
 } from "lucide-react";
 import { useProjectsList, useProjectMutations } from "@/hooks/useProjects";
 import { EditProjectModal } from "./EditProjectModal";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 import { Spinner } from "@/components/ui/Spinner";
 import Link from "next/link";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { toast } from "sonner";
 import { motion } from "framer-motion";

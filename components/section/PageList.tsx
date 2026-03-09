@@ -5,10 +5,10 @@ import { Trash2, FileText, Edit } from "lucide-react";
 import Link from "next/link";
 import { usePagesList, usePageMutations } from "@/hooks/usePages";
 import { Spinner } from "@/components/ui/Spinner";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 import type { PageDto } from "@/types/Page.dto";
 import { EditPageModal } from "./EditPageModal";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { toast } from "sonner";
 

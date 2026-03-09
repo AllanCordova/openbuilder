@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import { User, Library, ArrowRight } from "lucide-react";
 import { usePublicProjectsList } from "@/hooks/usePublicProjects";
 import { Spinner } from "@/components/ui/Spinner";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { ScrollReveal, AmbientOrbs } from "@/components/landing";
 
 export default function ExplorePage() {

@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { User } from "lucide-react";
 import { usePublicProjectByIdQuery } from "@/hooks/usePublicProjects";
 import { Spinner } from "@/components/ui/Spinner";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { PublicPageList } from "@/components/section/PublicPageList";
-import { ReturnFallback } from "@/components/ui/ReturnFallback";
+import { ReturnFallback } from "@/components/ui/fallback/ReturnFallback";
 import { ScrollReveal, AmbientOrbs } from "@/components/landing";
 
 export default function PublicProjectIndex() {

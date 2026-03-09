@@ -7,11 +7,11 @@ import Link from "next/link";
 import { useProjectByIdQuery } from "@/hooks/useProjects";
 import { PageList } from "@/components/section/PageList";
 import { CreatePageForm } from "@/components/section/CreatePageForm";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
 import { Spinner } from "@/components/ui/Spinner";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { ExportProjectButton } from "@/components/project/ExportProjectButton";
-import { ReturnFallback } from "@/components/ui/ReturnFallback";
+import { ReturnFallback } from "@/components/ui/fallback/ReturnFallback";
 import { ScrollReveal, AmbientOrbs } from "@/components/landing";
 
 export default function ProjectDetailPage() {

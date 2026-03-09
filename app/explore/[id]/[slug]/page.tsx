@@ -5,10 +5,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePublicProjectByIdQuery } from "@/hooks/usePublicProjects";
 import { Spinner } from "@/components/ui/Spinner";
-import { EmptyFallback } from "@/components/ui/EmptyFallback";
-import { ErrorFallback } from "@/components/ui/ErrorFallback";
+import { EmptyFallback } from "@/components/ui/fallback/EmptyFallback";
+import { ErrorFallback } from "@/components/ui/fallback/ErrorFallback";
 import { Preview } from "@/components/build/Preview";
-import { ReturnFallback } from "@/components/ui/ReturnFallback";
+import { ReturnFallback } from "@/components/ui/fallback/ReturnFallback";
 
 export default function PublicPageDetail() {
   const params = useParams();

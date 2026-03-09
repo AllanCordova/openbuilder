@@ -20,8 +20,8 @@ import Image from "next/image";
 const navLinks = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Projects", href: "/projects", icon: FolderKanban },
-  { name: "Settings", href: "/settings", icon: Settings },
   { name: "Community", href: "/explore", icon: Library },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export const Sidebar = ({

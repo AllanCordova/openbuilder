@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import type { PageDto } from "@/types/Page.dto";
 import { usePageMutations } from "@/hooks/usePages";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 import { toast } from "sonner";
 
 type EditPageModalProps = {

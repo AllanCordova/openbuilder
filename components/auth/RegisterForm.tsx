@@ -9,7 +9,7 @@ import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { useRouter } from "next/navigation";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 
 export const RegisterForm = () => {
   const {

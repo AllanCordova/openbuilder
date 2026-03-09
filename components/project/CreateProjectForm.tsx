@@ -10,7 +10,7 @@ import type { ZodIssue } from "zod";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { useProjectMutations } from "@/hooks/useProjects";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 import { toast } from "sonner";
 
 type CreateProjectFormProps = {

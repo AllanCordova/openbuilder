@@ -1,7 +1,7 @@
 import { getProjectPages } from "@/actions/Page.action";
-import { EmptyFallback } from "../ui/EmptyFallback";
+import { EmptyFallback } from "../ui/fallback/EmptyFallback";
 import { PageDeck } from "./PageDeck";
-import { ErrorFallback } from "../ui/ErrorFallback";
+import { ErrorFallback } from "../ui/fallback/ErrorFallback";
 
 export default async function PageGallery({
   projectId,
